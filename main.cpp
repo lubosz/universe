@@ -14,14 +14,11 @@
 #include <iomanip>
 #include <math.h>
 
+#include <iostream>
 
 //OpenGL stuff
 #include <GL/glew.h>
-#if defined __APPLE__ || defined(MACOSX)
-    #include <GLUT/glut.h>
-#else
-    #include <GL/glut.h>
-#endif
+#include <GLFW/glfw3.h>
 
 //Our OpenCL Particle Systemclass
 #include "cll.h"
@@ -47,7 +44,6 @@ void appKeyboard(unsigned char key, int x, int y);
 void appMouse(int button, int state, int x, int y);
 void appMotion(int x, int y);
 
-//----------------------------------------------------------------------
 //quick random function to distribute our initial points
 float rand_float(float mn, float mx)
 {
@@ -55,13 +51,78 @@ float rand_float(float mn, float mx)
     return mn + (mx-mn)*r;
 }
 
+static void error_callback(int error, const char* description)
+{
+    fputs(description, stderr);
+}
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+}
 
-//----------------------------------------------------------------------
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    //handle mouse interaction for rotating/zooming the view
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        mouse_buttons |= 1<<button;
+    } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+        mouse_buttons = 0;
+    }
+
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+
+    mouse_old_x = x;
+    mouse_old_y = y;
+}
+
+static void cursor_position_callback(GLFWwindow* window, double x, double y)
+{
+    //hanlde the mouse motion for zooming and rotating the view
+    float dx, dy;
+    dx = x - mouse_old_x;
+    dy = y - mouse_old_y;
+
+    if (mouse_buttons & 1) {
+        rotate_x += dy * 0.2;
+        rotate_y += dx * 0.2;
+    } else if (mouse_buttons & 4) {
+        translate_z += dy * 0.1;
+    }
+
+    mouse_old_x = x;
+    mouse_old_y = y;
+
+    // set view matrix
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(0.0, 0.0, translate_z);
+    glRotatef(rotate_x, 1.0, 0.0, 0.0);
+    glRotatef(rotate_y, 0.0, 1.0, 0.0);
+}
+
 int main(int argc, char** argv)
 {
+    GLFWwindow* window;
+    glfwSetErrorCallback(error_callback);
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+    window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
+
     printf("Hello, OpenCL\n");
-    //Setup our GLUT window and OpenGL related things
-    //glut callback functions are setup here too
+    //Setup OpenGL related things
     init_gl(argc, argv);
 
     //initialize our CL object, this sets up the context
@@ -104,14 +165,23 @@ int main(int argc, char** argv)
     //initialize the kernel
     example->popCorn();
     
-    //this starts the GLUT program, from here on out everything we want
-    //to do needs to be done in glut callback functions
-    glutMainLoop();
+    while (!glfwWindowShouldClose(window))
+    {
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+        glViewport(0, 0, width, height);
+        appRender();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    exit(EXIT_SUCCESS);
 
 }
 
-
-//----------------------------------------------------------------------
 void appRender()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -146,32 +216,10 @@ void appRender()
     //printf("disable stuff\n");
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
-    
-    glutSwapBuffers();
 }
 
-
-//----------------------------------------------------------------------
 void init_gl(int argc, char** argv)
 {
-
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(window_width, window_height);
-    glutInitWindowPosition (glutGet(GLUT_SCREEN_WIDTH)/2 - window_width/2, 
-                            glutGet(GLUT_SCREEN_HEIGHT)/2 - window_height/2);
-
-    
-    std::stringstream ss;
-    ss << "Adventures in OpenCL: Part 2, " << NUM_PARTICLES << " particles" << std::ends;
-    glutWindowHandle = glutCreateWindow(ss.str().c_str());
-
-    glutDisplayFunc(appRender); //main rendering function
-    glutTimerFunc(30, timerCB, 30); //determin a minimum time between frames
-    glutKeyboardFunc(appKeyboard);
-    glutMouseFunc(appMouse);
-    glutMotionFunc(appMotion);
-
     glewInit();
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -190,88 +238,6 @@ void init_gl(int argc, char** argv)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.0, 0.0, translate_z);
-
-}
-
-
-//----------------------------------------------------------------------
-void appDestroy()
-{
-    //this makes sure we properly cleanup our OpenCL context
-    delete example;
-    if(glutWindowHandle)glutDestroyWindow(glutWindowHandle);
-    printf("about to exit!\n");
-
-    exit(0);
-}
-
-
-//----------------------------------------------------------------------
-void timerCB(int ms)
-{
-    //this makes sure the appRender function is called every ms miliseconds
-    glutTimerFunc(ms, timerCB, ms);
-    glutPostRedisplay();
-}
-
-
-//----------------------------------------------------------------------
-void appKeyboard(unsigned char key, int x, int y)
-{
-    //this way we can exit the program cleanly
-    switch(key)
-    {
-        case '\033': // escape quits
-        case '\015': // Enter quits    
-        case 'Q':    // Q quits
-        case 'q':    // q (or escape) quits
-            // Cleanup up and quit
-            appDestroy();
-            break;
-    }
-}
-
-
-//----------------------------------------------------------------------
-void appMouse(int button, int state, int x, int y)
-{
-    //handle mouse interaction for rotating/zooming the view
-    if (state == GLUT_DOWN) {
-        mouse_buttons |= 1<<button;
-    } else if (state == GLUT_UP) {
-        mouse_buttons = 0;
-    }
-
-    mouse_old_x = x;
-    mouse_old_y = y;
-}
-
-
-//----------------------------------------------------------------------
-void appMotion(int x, int y)
-{
-    //hanlde the mouse motion for zooming and rotating the view
-    float dx, dy;
-    dx = x - mouse_old_x;
-    dy = y - mouse_old_y;
-
-    if (mouse_buttons & 1) {
-        rotate_x += dy * 0.2;
-        rotate_y += dx * 0.2;
-    } else if (mouse_buttons & 4) {
-        translate_z += dy * 0.1;
-    }
-
-    mouse_old_x = x;
-    mouse_old_y = y;
-
-    // set view matrix
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(0.0, 0.0, translate_z);
-    glRotatef(rotate_x, 1.0, 0.0, 0.0);
-    glRotatef(rotate_y, 0.0, 1.0, 0.0);
 }
 
 
