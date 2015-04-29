@@ -7,6 +7,9 @@
  * code based on advisor Gordon Erlebacher's work
  * NVIDIA's examples
  * as well as various blogs and resources on the internet
+ *
+ * Ported to GL4 and GFLW by Lubosz Sarnecki <lubosz@gmail.com>
+ *
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,8 +20,12 @@
 #include <iostream>
 
 //OpenGL stuff
+//#define GL_GLEXT_PROTOTYPES
+//#include <GL/glcorearb.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 //Our OpenCL Particle Systemclass
 #include "cll.h"
@@ -43,6 +50,12 @@ void timerCB(int ms);
 void appKeyboard(unsigned char key, int x, int y);
 void appMouse(int button, int state, int x, int y);
 void appMotion(int x, int y);
+
+GLuint shader_programm;
+GLuint vao = 0;
+
+glm::mat4 model;
+glm::mat4 projection;
 
 //quick random function to distribute our initial points
 float rand_float(float mn, float mx)
@@ -96,11 +109,10 @@ static void cursor_position_callback(GLFWwindow* window, double x, double y)
 
     // set view matrix
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(0.0, 0.0, translate_z);
-    glRotatef(rotate_x, 1.0, 0.0, 0.0);
-    glRotatef(rotate_y, 0.0, 1.0, 0.0);
+
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
+    model = glm::rotate(model, rotate_x, glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, rotate_y, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 int main(int argc, char** argv)
@@ -109,6 +121,11 @@ int main(int argc, char** argv)
     glfwSetErrorCallback(error_callback);
     if (!glfwInit())
         exit(EXIT_FAILURE);
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
     if (!window)
     {
@@ -170,6 +187,11 @@ int main(int argc, char** argv)
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
+
+        projection = glm::perspective(90.0f,
+                                      (GLfloat)window_width / (GLfloat) window_height,
+                                      0.1f, 1000.f);
+
         appRender();
 
         glfwSwapBuffers(window);
@@ -179,12 +201,13 @@ int main(int argc, char** argv)
     glfwDestroyWindow(window);
     glfwTerminate();
     exit(EXIT_SUCCESS);
-
 }
 
 void appRender()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUseProgram (shader_programm);
+    glBindVertexArray (vao);
 
     //this updates the particle system by calling the kernel
     example->runKernel();
@@ -192,35 +215,78 @@ void appRender()
     //render the particles from VBOs
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_POINT_SMOOTH);
     glPointSize(5.);
     
-    //printf("color buffer\n");
-    glBindBuffer(GL_ARRAY_BUFFER, example->c_vbo);
-    glColorPointer(4, GL_FLOAT, 0, 0);
-
-    //printf("vertex buffer\n");
+    glGenVertexArrays (1, &vao);
+    glBindVertexArray (vao);
+    glEnableVertexAttribArray (0);
     glBindBuffer(GL_ARRAY_BUFFER, example->p_vbo);
-    glVertexPointer(4, GL_FLOAT, 0, 0);
+    glVertexAttribPointer (0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
-    //printf("enable client state\n");
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
+    glEnableVertexAttribArray (1);
+    glBindBuffer(GL_ARRAY_BUFFER, example->c_vbo);
+    glVertexAttribPointer (1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
-    //Need to disable these for blender
-    glDisableClientState(GL_NORMAL_ARRAY);
+    glm::mat4 mvp = projection * model;
 
-    //printf("draw arrays\n");
+    GLint UniformMVP = glGetUniformLocation(shader_programm, "mvp");
+
+    glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &mvp[0][0]);
+
     glDrawArrays(GL_POINTS, 0, example->num);
 
-    //printf("disable stuff\n");
-    glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void init_gl(int argc, char** argv)
 {
-    glewInit();
+    glewExperimental = GL_TRUE;
+
+    GLenum glewError = glewInit();
+
+    if (glewError != GLEW_OK)
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+
+    model = glm::mat4(1.0f);
+
+    // get version info
+    const GLubyte* renderer = glGetString (GL_RENDERER); // get renderer string
+    const GLubyte* version = glGetString (GL_VERSION); // version as a string
+    printf ("Renderer: %s\n", renderer);
+    printf ("OpenGL version supported %s\n", version);
+
+    const char* vertex_shader =
+    "#version 400\n"
+    "in vec4 vp;"
+    "in vec4 cp;"
+    "uniform mat4 mvp;"
+    "out vec4 color;"
+    "void main () {"
+    "color = cp;"
+    "  gl_Position = mvp * vec4 (vp);"
+    "}";
+
+    const char* fragment_shader =
+    "#version 400\n"
+    "in vec4 color;"
+    "out vec4 frag_colour;"
+    "void main () {"
+    "  frag_colour = color;"
+    "}";
+
+    GLuint vs = glCreateShader (GL_VERTEX_SHADER);
+    glShaderSource (vs, 1, &vertex_shader, NULL);
+    glCompileShader (vs);
+    GLuint fs = glCreateShader (GL_FRAGMENT_SHADER);
+    glShaderSource (fs, 1, &fragment_shader, NULL);
+    glCompileShader (fs);
+
+    shader_programm = glCreateProgram ();
+    glAttachShader (shader_programm, fs);
+    glAttachShader (shader_programm, vs);
+    glLinkProgram (shader_programm);
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDisable(GL_DEPTH_TEST);
@@ -228,17 +294,12 @@ void init_gl(int argc, char** argv)
     // viewport
     glViewport(0, 0, window_width, window_height);
 
-    // projection
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(90.0, (GLfloat)window_width / (GLfloat) window_height, 0.1, 1000.0);
+    projection = glm::perspective(90.0f,
+                                  (GLfloat)window_width / (GLfloat) window_height,
+                                  0.1f, 1000.f);
 
     // set view matrix
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(0.0, 0.0, translate_z);
+
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
 }
-
-
-
