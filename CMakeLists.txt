@@ -34,6 +34,21 @@ endif()
 #Set c++1
 add_cxxflag("-std=c++14")
 
+# add some warnings
+add_cxxflag("-Wall")
+add_cxxflag("-Wextra")
+add_cxxflag("-Wuninitialized")
+add_cxxflag("-Wold-style-cast")
+add_cxxflag("-Woverloaded-virtual")
+add_cxxflag("-Wformat=2")
+add_cxxflag("-Wundef")
+add_cxxflag("-Wpointer-arith")
+add_cxxflag("-Wcast-qual")
+add_cxxflag("-Wlogical-op")
+add_cxxflag("-Woverflow")
+add_cxxflag("-Wmissing-declarations")
+add_cxxflag("-Wredundant-decls")
+
 ADD_EXECUTABLE(universe
   src/main.cpp
   src/Simulator.cpp
