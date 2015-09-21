@@ -51,6 +51,7 @@ add_cxxflag("-Wredundant-decls")
 ADD_EXECUTABLE(universe
   src/main.cpp
   src/Simulator.cpp
+  src/Renderer.cpp
   src/util.cpp)
 
 TARGET_LINK_LIBRARIES (universe

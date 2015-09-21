@@ -22,50 +22,23 @@
 
 #include <iostream>
 
-#include <string>
-#include <fstream>
-#include <streambuf>
 
-
-//OpenGL stuff
-#include <GL/glew.h>
-# define GLCOREARB_PROTOTYPES 1
-# define GL_GLEXT_PROTOTYPES 1
-#include <GL/glcorearb.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-//Our OpenCL Particle Systemclass
-#include "Simulator.h"
 #include "Renderer.h"
+#include "Simulator.h"
+#include "util.h"
 
 #define NUM_PARTICLES 200000
+
 Simulator* simulator;
+Renderer* renderer;
 
 //GL related variables
 int window_width = 1280;
 int window_height = 720;
-float translate_z = -1.f;
 // mouse controls
 int mouse_old_x, mouse_old_y;
 int mouse_buttons = 0;
-float rotate_x = 0.0, rotate_y = 0.0;
 
-GLuint shader_programm;
-GLuint vao = 0;
-
-glm::mat4 model;
-glm::mat4 projection;
-
-std::vector<std::string> shaders;
-
-//quick random function to distribute our initial points
-float randomFloat(float mn, float mx)
-{
-    float r = random() / (float) RAND_MAX;
-    return mn + (mx-mn)*r;
-}
 
 static void errorCallback(int error, const char* description)
 {
@@ -101,129 +74,24 @@ static void cursorCallback(GLFWwindow* window, double x, double y)
     dy = y - mouse_old_y;
 
     if (mouse_buttons & 1) {
-        rotate_x += dy * 0.2;
-        rotate_y += dx * 0.2;
+        renderer->rotate(dx, dy);
+
     } else if (mouse_buttons & 4) {
-        translate_z += dy * 0.1;
+        renderer->translate(dy);
     }
 
     mouse_old_x = x;
     mouse_old_y = y;
 
-    // set view matrix
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
-    model = glm::rotate(model, rotate_x, glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, rotate_y, glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
-std::string readFile(const char* fileName) {
-    std::ifstream stream(fileName);
-    std::string source((std::istreambuf_iterator<char>(stream)),
-                              std::istreambuf_iterator<char>());
-
-    if (source.size() == 0) {
-        std::cout << "ERROR: Could not load " << fileName << ".\n";
-        return "";
-    }
-
-    return source;
+    renderer->updateView();
 }
 
 void render()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glUseProgram (shader_programm);
-    glBindVertexArray (vao);
-
+    renderer->bindVAO();
     //this updates the particle system by calling the kernel
     simulator->runKernel();
-
-    //render the particles from VBOs
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glPointSize(5.);
-    
-    glGenVertexArrays (1, &vao);
-    glBindVertexArray (vao);
-    glEnableVertexAttribArray (0);
-    glBindBuffer(GL_ARRAY_BUFFER, simulator->positionVBO);
-    glVertexAttribPointer (0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-
-    glEnableVertexAttribArray (1);
-    glBindBuffer(GL_ARRAY_BUFFER, simulator->colorVBO);
-    glVertexAttribPointer (1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-
-    glm::mat4 mvp = projection * model;
-
-    GLint UniformMVP = glGetUniformLocation(shader_programm, "mvp");
-
-    glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &mvp[0][0]);
-
-    glDrawArrays(GL_POINTS, 0, simulator->particleCount);
-
-}
-
-void initShaders() {
-    shaders.push_back(readFile("gpu/MVP.vert"));
-    shaders.push_back(readFile("gpu/color.frag"));
-
-    const char* vertex[] = {shaders[0].c_str()};
-    const char* fragment[] = {shaders[1].c_str()};
-
-    GLuint vs = glCreateShader (GL_VERTEX_SHADER);
-    glShaderSource (vs, 1, vertex, NULL);
-    glCompileShader (vs);
-    GLuint fs = glCreateShader (GL_FRAGMENT_SHADER);
-    glShaderSource (fs, 1, fragment, NULL);
-    glCompileShader (fs);
-
-    shader_programm = glCreateProgram ();
-    glAttachShader (shader_programm, fs);
-    glAttachShader (shader_programm, vs);
-    glLinkProgram (shader_programm);
-}
-
-void printContextInfo() {
-    // get version info
-    const GLubyte* renderer = glGetString (GL_RENDERER); // get renderer string
-    const GLubyte* version = glGetString (GL_VERSION); // version as a string
-    printf ("Renderer: %s\n", renderer);
-    printf ("OpenGL version supported %s\n", version);
-}
-
-void initGL()
-{
-    glewExperimental = GL_TRUE;
-    GLenum glewError = glewInit();
-    if (glewError != GLEW_OK)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    glError;
-
-    model = glm::mat4(1.0f);
-
-    printContextInfo();
-    initShaders();
-
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glDisable(GL_DEPTH_TEST);
-
-    // viewport
-    glViewport(0, 0, window_width, window_height);
-
-    float aspect = static_cast<GLfloat>(window_width)
-            / static_cast<GLfloat>(window_height);
-
-    projection = glm::perspective(90.0f, aspect, 0.1f, 1000.f);
-
-    // set view matrix
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
+    renderer->draw(simulator->positionVBO, simulator->colorVBO, simulator->particleCount);
 }
 
 GLFWwindow* initGLFW() {
@@ -289,10 +157,12 @@ int main(int argc, char** argv)
 {
     GLFWwindow* window = initGLFW();
     //Setup OpenGL related things
-    initGL();
+    renderer->initGL(window_width, window_height);
 
     //initialize our CL object, this sets up the context
     simulator = new Simulator();
+
+    renderer = new Renderer();
 
     std::string kernel_source = readFile("gpu/vortex.cl");
 
@@ -306,12 +176,10 @@ int main(int argc, char** argv)
     {
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
+
         glViewport(0, 0, width, height);
 
-        float aspect = static_cast<GLfloat>(window_width)
-                / static_cast<GLfloat>(window_height);
-
-        projection = glm::perspective(90.0f, aspect, 0.1f, 1000.f);
+        renderer->updateProjection(window_width, window_height);
 
         render();
 

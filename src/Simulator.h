@@ -1,5 +1,5 @@
-#ifndef ADVCL_CLL_H_INCLUDED
-#define ADVCL_CLL_H_INCLUDED
+#ifndef SIMULATOR_H
+#define SIMULATOR_H
 
 #define __CL_ENABLE_EXCEPTIONS
 #include "CL/cl.hpp"
