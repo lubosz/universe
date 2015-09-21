@@ -63,6 +63,8 @@ GLuint vao = 0;
 glm::mat4 model;
 glm::mat4 projection;
 
+std::vector<std::string> shaders;
+
 //quick random function to distribute our initial points
 float rand_float(float mn, float mx)
 {
@@ -284,18 +286,21 @@ void init_gl(int argc, char** argv)
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported %s\n", version);
 
-    const char* mvpVertex = readFile("gpu/MVP.vert").c_str();
-    const char* colorFragment = readFile("gpu/color.frag").c_str();
 
-    std::cout << "colorFragment " << colorFragment;
+    shaders.push_back(readFile("gpu/MVP.vert"));
+    shaders.push_back(readFile("gpu/color.frag"));
+
+    const char* vertex[] = {shaders[0].c_str()};
+    const char* fragment[] = {shaders[1].c_str()};
+
 
     glError;
 
     GLuint vs = glCreateShader (GL_VERTEX_SHADER);
-    glShaderSource (vs, 1, &mvpVertex, NULL);
+    glShaderSource (vs, 1, vertex, NULL);
     glCompileShader (vs);
     GLuint fs = glCreateShader (GL_FRAGMENT_SHADER);
-    glShaderSource (fs, 1, &colorFragment, NULL);
+    glShaderSource (fs, 1, fragment, NULL);
     glCompileShader (fs);
 
     shader_programm = glCreateProgram ();
