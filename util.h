@@ -4,6 +4,8 @@
 #ifndef ADVCL_UTIL_H_INCLUDED
 #define ADVCL_UTIL_H_INCLUDED
 
+#include <GL/gl.h>
+
 const char* oclErrorString(cl_int error);
 
 //create a VBO
