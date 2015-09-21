@@ -49,8 +49,8 @@ int mouse_old_x, mouse_old_y;
 int mouse_buttons = 0;
 float rotate_x = 0.0, rotate_y = 0.0;
 //main app helper functions
-void init_gl(int argc, char** argv);
-void appRender();
+void initGL();
+void render();
 void appDestroy();
 void timerCB(int ms);
 void appKeyboard(unsigned char key, int x, int y);
@@ -66,23 +66,23 @@ glm::mat4 projection;
 std::vector<std::string> shaders;
 
 //quick random function to distribute our initial points
-float rand_float(float mn, float mx)
+float randomFloat(float mn, float mx)
 {
     float r = random() / (float) RAND_MAX;
     return mn + (mx-mn)*r;
 }
 
-static void error_callback(int error, const char* description)
+static void errorCallback(int error, const char* description)
 {
     fputs(description, stderr);
 }
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+void buttonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     //handle mouse interaction for rotating/zooming the view
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
@@ -98,7 +98,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     mouse_old_y = y;
 }
 
-static void cursor_position_callback(GLFWwindow* window, double x, double y)
+static void positionCallback(GLFWwindow* window, double x, double y)
 {
     //hanlde the mouse motion for zooming and rotating the view
     float dx, dy;
@@ -141,7 +141,7 @@ std::string readFile(const char* fileName) {
 int main(int argc, char** argv)
 {
     GLFWwindow* window;
-    glfwSetErrorCallback(error_callback);
+    glfwSetErrorCallback(errorCallback);
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
@@ -157,13 +157,13 @@ int main(int argc, char** argv)
     }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetCursorPosCallback(window, cursor_position_callback);
+    glfwSetKeyCallback(window, keyCallback);
+    glfwSetMouseButtonCallback(window, buttonCallback);
+    glfwSetCursorPosCallback(window, positionCallback);
 
     printf("Hello, OpenCL\n");
     //Setup OpenGL related things
-    init_gl(argc, argv);
+    initGL();
 
     //initialize our CL object, this sets up the context
     example = new CL();
@@ -182,7 +182,7 @@ int main(int argc, char** argv)
     for(int i = 0; i < num; i++)
     {
         //distribute the particles in a random circle around z axis
-        float rad = rand_float(.2, .5);
+        float rad = randomFloat(.2, .5);
         float x = rad*sin(2*3.14 * i/num);
         float z = 0.0f;// -.1 + .2f * i/num;
         float y = rad*cos(2*3.14 * i/num);
@@ -193,7 +193,7 @@ int main(int argc, char** argv)
         //float yr = rand_float(1.f, 3.f);
         //the life is the lifetime of the particle: 1 = alive 0 = dead
         //as you will see in part2.cl we reset the particle when it dies
-        float life_r = rand_float(0.f, 1.f);
+        float life_r = randomFloat(0.f, 1.f);
         vel[i] = Vec4(0.0, 0.0, 3.0f, life_r);
 
         //just make them red and full alpha
@@ -215,7 +215,7 @@ int main(int argc, char** argv)
                                       (GLfloat)window_width / (GLfloat) window_height,
                                       0.1f, 1000.f);
 
-        appRender();
+        render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -226,7 +226,7 @@ int main(int argc, char** argv)
     exit(EXIT_SUCCESS);
 }
 
-void appRender()
+void render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram (shader_programm);
@@ -260,7 +260,7 @@ void appRender()
 
 }
 
-void init_gl(int argc, char** argv)
+void initGL()
 {
     glewExperimental = GL_TRUE;
 
@@ -293,9 +293,6 @@ void init_gl(int argc, char** argv)
     const char* vertex[] = {shaders[0].c_str()};
     const char* fragment[] = {shaders[1].c_str()};
 
-
-    glError;
-
     GLuint vs = glCreateShader (GL_VERTEX_SHADER);
     glShaderSource (vs, 1, vertex, NULL);
     glCompileShader (vs);
@@ -307,8 +304,6 @@ void init_gl(int argc, char** argv)
     glAttachShader (shader_programm, fs);
     glAttachShader (shader_programm, vs);
     glLinkProgram (shader_programm);
-
-    glError;
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDisable(GL_DEPTH_TEST);
