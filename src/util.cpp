@@ -7,7 +7,7 @@
 //OpenGL stuff
 #include <GL/glew.h>
 
-#include "cll.h"
+#include "Simulator.h"
 #include "util.h"
 
 

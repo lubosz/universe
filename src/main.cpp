@@ -33,8 +33,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 //Our OpenCL Particle Systemclass
-#include "cll.h"
-#include "opengl.h"
+#include "Simulator.h"
+#include "Renderer.h"
 
 #define NUM_PARTICLES 20000
 CL* example;
