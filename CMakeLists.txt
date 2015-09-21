@@ -46,7 +46,6 @@ add_cxxflag("-Wpointer-arith")
 add_cxxflag("-Wcast-qual")
 add_cxxflag("-Wlogical-op")
 add_cxxflag("-Woverflow")
-add_cxxflag("-Wmissing-declarations")
 add_cxxflag("-Wredundant-decls")
 
 ADD_EXECUTABLE(universe

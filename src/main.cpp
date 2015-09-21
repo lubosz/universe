@@ -11,6 +11,9 @@
  * Ported to GL4 and GFLW by Lubosz Sarnecki <lubosz@gmail.com>
  *
  */
+
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sstream>
@@ -210,9 +213,11 @@ void initGL()
 
     // viewport
     glViewport(0, 0, window_width, window_height);
-    projection = glm::perspective(90.0f,
-                                  (GLfloat)window_width / (GLfloat) window_height,
-                                  0.1f, 1000.f);
+
+    float aspect = static_cast<GLfloat>(window_width)
+            / static_cast<GLfloat>(window_height);
+
+    projection = glm::perspective(90.0f, aspect, 0.1f, 1000.f);
 
     // set view matrix
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -302,9 +307,10 @@ int main(int argc, char** argv)
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
 
-        projection = glm::perspective(90.0f,
-                                      (GLfloat)window_width / (GLfloat) window_height,
-                                      0.1f, 1000.f);
+        float aspect = static_cast<GLfloat>(window_width)
+                / static_cast<GLfloat>(window_height);
+
+        projection = glm::perspective(90.0f, aspect, 0.1f, 1000.f);
 
         render();
 

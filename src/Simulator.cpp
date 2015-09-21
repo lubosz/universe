@@ -14,20 +14,20 @@ Simulator::Simulator()
     std::vector<cl::Platform> platforms;
     err = cl::Platform::get(&platforms);
     printf("cl::Platform::get(): %s\n", oclErrorString(err));
-    printf("platforms.size(): %d\n", platforms.size());
+    printf("platforms.size(): %ld\n", platforms.size());
 
     deviceUsed = 0;
     err = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
     printf("getDevices: %s\n", oclErrorString(err));
-    printf("devices.size(): %d\n", devices.size());
+    printf("devices.size(): %ld\n", devices.size());
     int t = devices.front().getInfo<CL_DEVICE_TYPE>();
     printf("type: device: %d CL_DEVICE_TYPE_GPU: %d \n", t, CL_DEVICE_TYPE_GPU);
 
     cl_context_properties props[] =
     {
-        CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
-        CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
-        CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[0])(),
+        CL_GL_CONTEXT_KHR, reinterpret_cast<cl_context_properties>(glXGetCurrentContext()),
+        CL_GLX_DISPLAY_KHR, reinterpret_cast<cl_context_properties>(glXGetCurrentDisplay()),
+        CL_CONTEXT_PLATFORM, reinterpret_cast<cl_context_properties>((platforms[0])()),
         0
     };
     //cl_context cxGPUContext = clCreateContext(props, 1, &cdDevices[uiDeviceUsed], NULL, NULL, &err);
