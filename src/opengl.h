@@ -26,7 +26,8 @@ void checkGlError(const char* file, int line) {
                 error = "Unknown error";
                 break;
         }
-        std::cout << "GL_" << error << " " << file << " " << line << "\n";
+        std::cout << "GL ERROR: GL_" << error << " " << file << " " << line << "\n";
+        err = glGetError();
     }
 }
 
