@@ -248,20 +248,7 @@ GLFWwindow* initGLFW() {
     return window;
 }
 
-int main(int argc, char** argv)
-{
-    GLFWwindow* window = initGLFW();
-    printf("Hello, OpenCL\n");
-    //Setup OpenGL related things
-    initGL();
-
-    //initialize our CL object, this sets up the context
-    example = new CL();
-
-    std::string kernel_source = readFile("gpu/vortex.cl");
-
-    example->loadProgram(kernel_source);
-
+void initParticles(CL * simulator) {
     //initialize our particle system with positions, velocities and color
     int num = NUM_PARTICLES;
     std::vector<Vec4> pos(num);
@@ -291,7 +278,24 @@ int main(int argc, char** argv)
     }
 
     //our load data function sends our initial values to the GPU
-    example->loadData(pos, vel, color);
+    simulator->loadData(pos, vel, color);
+}
+
+int main(int argc, char** argv)
+{
+    GLFWwindow* window = initGLFW();
+    printf("Hello, OpenCL\n");
+    //Setup OpenGL related things
+    initGL();
+
+    //initialize our CL object, this sets up the context
+    example = new CL();
+
+    std::string kernel_source = readFile("gpu/vortex.cl");
+
+    example->loadProgram(kernel_source);
+
+    initParticles(example);
     //initialize the kernel
     example->popCorn();
 
