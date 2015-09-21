@@ -1,6 +1,3 @@
-#define STRINGIFY(A) #A
-
-std::string kernel_source = STRINGIFY(
 __kernel void part2(__global float4* pos, __global float4* color, __global float4* vel, __global float4* pos_gen, __global float4* vel_gen, float dt)
 {
     //get our index in the array
@@ -40,4 +37,3 @@ __kernel void part2(__global float4* pos, __global float4* color, __global float
     color[i].w = life;
 
 }
-);

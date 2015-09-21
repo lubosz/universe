@@ -19,6 +19,11 @@
 
 #include <iostream>
 
+#include <string>
+#include <fstream>
+#include <streambuf>
+
+
 //OpenGL stuff
 //#define GL_GLEXT_PROTOTYPES
 //#include <GL/glcorearb.h>
@@ -145,8 +150,14 @@ int main(int argc, char** argv)
     //initialize our CL object, this sets up the context
     example = new CL();
     
-    //load and build our CL program from the file
-    #include "../gpu/vortex.cl" //std::string kernel_source is defined in this file
+    std::ifstream stream("gpu/vortex.cl");
+    std::string kernel_source((std::istreambuf_iterator<char>(stream)),
+                              std::istreambuf_iterator<char>());
+
+    if ( kernel_source.size() == 0) {
+        std::cout << "ERROR: Could not load kernel.\n";
+        return 0;
+    }
     example->loadProgram(kernel_source);
 
     //initialize our particle system with positions, velocities and color
