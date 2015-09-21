@@ -223,8 +223,7 @@ void initGL()
     model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
 }
 
-int main(int argc, char** argv)
-{
+GLFWwindow* initGLFW() {
     GLFWwindow* window;
     glfwSetErrorCallback(errorCallback);
     if (!glfwInit())
@@ -246,6 +245,12 @@ int main(int argc, char** argv)
     glfwSetMouseButtonCallback(window, buttonCallback);
     glfwSetCursorPosCallback(window, cursorCallback);
 
+    return window;
+}
+
+int main(int argc, char** argv)
+{
+    GLFWwindow* window = initGLFW();
     printf("Hello, OpenCL\n");
     //Setup OpenGL related things
     initGL();
