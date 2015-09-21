@@ -34,6 +34,7 @@
 
 //Our OpenCL Particle Systemclass
 #include "cll.h"
+#include "opengl.h"
 
 #define NUM_PARTICLES 20000
 CL* example;
@@ -120,6 +121,21 @@ static void cursor_position_callback(GLFWwindow* window, double x, double y)
     model = glm::rotate(model, rotate_y, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
+std::string readFile(const char* fileName) {
+    std::ifstream stream(fileName);
+    std::string source((std::istreambuf_iterator<char>(stream)),
+                              std::istreambuf_iterator<char>());
+
+    if (source.size() == 0) {
+        std::cout << "ERROR: Could not load " << fileName << ".\n";
+        return "";
+    }
+
+    return source;
+}
+
+
+
 int main(int argc, char** argv)
 {
     GLFWwindow* window;
@@ -150,14 +166,8 @@ int main(int argc, char** argv)
     //initialize our CL object, this sets up the context
     example = new CL();
     
-    std::ifstream stream("gpu/vortex.cl");
-    std::string kernel_source((std::istreambuf_iterator<char>(stream)),
-                              std::istreambuf_iterator<char>());
+    std::string kernel_source = readFile("gpu/vortex.cl");
 
-    if ( kernel_source.size() == 0) {
-        std::cout << "ERROR: Could not load kernel.\n";
-        return 0;
-    }
     example->loadProgram(kernel_source);
 
     //initialize our particle system with positions, velocities and color
