@@ -115,3 +115,21 @@ const char* oclErrorString(cl_int error)
 
 }
 
+float randomFloat(float mn, float mx)
+{
+    float r = random() / (float) RAND_MAX;
+    return mn + (mx-mn)*r;
+}
+
+std::string readFile(const char* fileName) {
+    std::ifstream stream(fileName);
+    std::string source((std::istreambuf_iterator<char>(stream)),
+                              std::istreambuf_iterator<char>());
+
+    if (source.size() == 0) {
+        std::cout << "ERROR: Could not load " << fileName << ".\n";
+        return "";
+    }
+
+    return source;
+}

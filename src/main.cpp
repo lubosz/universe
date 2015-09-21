@@ -157,12 +157,13 @@ int main(int argc, char** argv)
 {
     GLFWwindow* window = initGLFW();
     //Setup OpenGL related things
+    renderer = new Renderer();
     renderer->initGL(window_width, window_height);
 
     //initialize our CL object, this sets up the context
     simulator = new Simulator();
 
-    renderer = new Renderer();
+
 
     std::string kernel_source = readFile("gpu/vortex.cl");
 
