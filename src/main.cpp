@@ -146,7 +146,7 @@ int main(int argc, char** argv)
     example = new CL();
     
     //load and build our CL program from the file
-    #include "part2.cl" //std::string kernel_source is defined in this file
+    #include "../gpu/vortex.cl" //std::string kernel_source is defined in this file
     example->loadProgram(kernel_source);
 
     //initialize our particle system with positions, velocities and color

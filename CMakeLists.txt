@@ -14,7 +14,11 @@ INCLUDE_DIRECTORIES(
     ${GLM_INCLUDE_PATH}
 )
 
-ADD_EXECUTABLE(universe main.cpp cll.cpp part2.cpp util.cpp)
+ADD_EXECUTABLE(universe
+  src/main.cpp
+  src/cll.cpp
+  src/part2.cpp
+  src/util.cpp)
 
 TARGET_LINK_LIBRARIES (universe
    ${OPENGL_LIBRARIES}
