@@ -284,30 +284,18 @@ void init_gl(int argc, char** argv)
     printf ("Renderer: %s\n", renderer);
     printf ("OpenGL version supported %s\n", version);
 
-    const char* vertex_shader =
-            "#version 400\n"
-            "in vec4 vp;"
-            "in vec4 cp;"
-            "uniform mat4 mvp;"
-            "out vec4 color;"
-            "void main () {"
-            "color = cp;"
-            "  gl_Position = mvp * vec4 (vp);"
-            "}";
+    const char* mvpVertex = readFile("gpu/MVP.vert").c_str();
+    const char* colorFragment = readFile("gpu/color.frag").c_str();
 
-    const char* fragment_shader =
-            "#version 400\n"
-            "in vec4 color;"
-            "out vec4 frag_colour;"
-            "void main () {"
-            "  frag_colour = color;"
-            "}";
+    std::cout << "colorFragment " << colorFragment;
+
+    glError;
 
     GLuint vs = glCreateShader (GL_VERTEX_SHADER);
-    glShaderSource (vs, 1, &vertex_shader, NULL);
+    glShaderSource (vs, 1, &mvpVertex, NULL);
     glCompileShader (vs);
     GLuint fs = glCreateShader (GL_FRAGMENT_SHADER);
-    glShaderSource (fs, 1, &fragment_shader, NULL);
+    glShaderSource (fs, 1, &colorFragment, NULL);
     glCompileShader (fs);
 
     shader_programm = glCreateProgram ();
