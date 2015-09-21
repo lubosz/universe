@@ -147,11 +147,11 @@ void render()
     glGenVertexArrays (1, &vao);
     glBindVertexArray (vao);
     glEnableVertexAttribArray (0);
-    glBindBuffer(GL_ARRAY_BUFFER, simulator->p_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, simulator->positionVBO);
     glVertexAttribPointer (0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
     glEnableVertexAttribArray (1);
-    glBindBuffer(GL_ARRAY_BUFFER, simulator->c_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, simulator->colorVBO);
     glVertexAttribPointer (1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
     glm::mat4 mvp = projection * model;
@@ -160,7 +160,7 @@ void render()
 
     glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &mvp[0][0]);
 
-    glDrawArrays(GL_POINTS, 0, simulator->num);
+    glDrawArrays(GL_POINTS, 0, simulator->particleCount);
 
 }
 
