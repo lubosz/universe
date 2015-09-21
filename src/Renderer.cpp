@@ -14,11 +14,6 @@ Renderer::~Renderer() {}
 void Renderer::draw(GLuint positionVBO, GLuint colorVBO, int particleCount) {
   //render the particles from VBOs
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glUseProgram (shader_programm);
-
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glPointSize(5.);
 
   glGenVertexArrays (1, &vao);
   glBindVertexArray (vao);
@@ -85,6 +80,13 @@ void Renderer::initGL(int width, int height)
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDisable(GL_DEPTH_TEST);
+
+    glUseProgram (shader_programm);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPointSize(5.);
+
 }
 
 void Renderer::bindVAO() {
