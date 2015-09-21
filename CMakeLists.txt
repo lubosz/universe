@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-project(minimal-opencl-gl4)
+project(universe)
 
 FIND_PACKAGE(OpenCL)
 FIND_PACKAGE(OpenGL)
@@ -14,9 +14,9 @@ INCLUDE_DIRECTORIES(
     ${GLM_INCLUDE_PATH}
 )
 
-ADD_EXECUTABLE(minimal-opencl-gl4 main.cpp cll.cpp part2.cpp util.cpp)
+ADD_EXECUTABLE(universe main.cpp cll.cpp part2.cpp util.cpp)
 
-TARGET_LINK_LIBRARIES (minimal-opencl-gl4
+TARGET_LINK_LIBRARIES (universe
    ${OPENGL_LIBRARIES}
    ${GLEW_LIBRARY}
    ${OpenCL_LIBRARY}
