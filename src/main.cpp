@@ -73,8 +73,6 @@ static void cursorCallback(GLFWwindow* window, double x, double y)
 
     mouse_old_x = x;
     mouse_old_y = y;
-
-    renderer->updateModel();
 }
 
 GLFWwindow* initGLFW() {

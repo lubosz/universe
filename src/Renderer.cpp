@@ -80,12 +80,11 @@ void Renderer::initGL(int width, int height)
 
     printContextInfo();
     initShaders();
+    updateProjection(width, height);
+    updateModel();
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDisable(GL_DEPTH_TEST);
-
-    updateProjection(width, height);
-    updateModel();
 }
 
 void Renderer::bindVAO() {
@@ -95,10 +94,12 @@ void Renderer::bindVAO() {
 void Renderer::rotate(float x, float y) {
     rotate_x += y * 0.2;
     rotate_y += x * 0.2;
+    updateModel();
 }
 
-void Renderer::translate(float y) {
-    translate_z += y * 0.1;
+void Renderer::translate(float z) {
+    translate_z += z * 0.1;
+    updateModel();
 }
 
 void Renderer::updateModel() {

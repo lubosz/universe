@@ -46,7 +46,7 @@ public:
     void updateProjection(int width, int height);
 
     void rotate(float x, float y);
-    void translate(float y);
+    void translate(float z);
 
     void draw(GLuint positionVBO, GLuint colorVBO, int particleCount);
     static void checkGlError(const char* file, int line);
