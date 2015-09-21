@@ -27,7 +27,7 @@ typedef struct Vec4
 } Vec4;
 //} Vec4 __attribute__((aligned(16)));
 
-class CL {
+class Simulator {
 public:
 
     //These are arrays we will use in this tutorial
@@ -42,9 +42,9 @@ public:
     size_t array_size; //the size of our arrays num * sizeof(Vec4)
 
     //default constructor initializes OpenCL context and automatically chooses platform and device
-    CL();
+    Simulator();
     //default destructor releases OpenCL objects and frees device memory
-    ~CL();
+    ~Simulator();
 
     //load an OpenCL program from a string
     void loadProgram(std::string kernel_source);

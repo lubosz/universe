@@ -16,7 +16,7 @@
 
 
 
-CL::CL()
+Simulator::Simulator()
 {
     printf("Initialize OpenCL object and context\n");
     //setup devices and context
@@ -103,12 +103,12 @@ CL::CL()
 
 }
 
-CL::~CL()
+Simulator::~Simulator()
 {
 }
 
 
-void CL::loadProgram(std::string kernel_source)
+void Simulator::loadProgram(std::string kernel_source)
 {
     // Program Setup
     int pl;
@@ -145,7 +145,7 @@ void CL::loadProgram(std::string kernel_source)
 
 }
 
-void CL::loadData(std::vector<Vec4> pos, std::vector<Vec4> vel, std::vector<Vec4> col)
+void Simulator::loadData(std::vector<Vec4> pos, std::vector<Vec4> vel, std::vector<Vec4> col)
 {
     //store the number of particles and the size in bytes of our arrays
     num = pos.size();
@@ -178,7 +178,7 @@ void CL::loadData(std::vector<Vec4> pos, std::vector<Vec4> vel, std::vector<Vec4
     queue.finish();
 }
 
-void CL::popCorn()
+void Simulator::popCorn()
 {
     printf("in popCorn\n");
     //initialize our kernel from the program
@@ -209,7 +209,7 @@ void CL::popCorn()
 
 
 
-void CL::runKernel()
+void Simulator::runKernel()
 {
     //this will update our system by calculating new velocity and updating the positions of our particles
     //Make sure OpenGL is done using our VBOs

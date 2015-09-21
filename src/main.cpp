@@ -37,7 +37,7 @@
 #include "Renderer.h"
 
 #define NUM_PARTICLES 20000
-CL* example;
+Simulator* example;
 
 //GL related variables
 int window_width = 800;
@@ -248,7 +248,7 @@ GLFWwindow* initGLFW() {
     return window;
 }
 
-void initParticles(CL * simulator) {
+void initParticles(Simulator * simulator) {
     //initialize our particle system with positions, velocities and color
     int num = NUM_PARTICLES;
     std::vector<Vec4> pos(num);
@@ -289,7 +289,7 @@ int main(int argc, char** argv)
     initGL();
 
     //initialize our CL object, this sets up the context
-    example = new CL();
+    example = new Simulator();
 
     std::string kernel_source = readFile("gpu/vortex.cl");
 
