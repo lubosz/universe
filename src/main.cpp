@@ -48,14 +48,6 @@ float translate_z = -1.f;
 int mouse_old_x, mouse_old_y;
 int mouse_buttons = 0;
 float rotate_x = 0.0, rotate_y = 0.0;
-//main app helper functions
-void initGL();
-void render();
-void appDestroy();
-void timerCB(int ms);
-void appKeyboard(unsigned char key, int x, int y);
-void appMouse(int button, int state, int x, int y);
-void appMotion(int x, int y);
 
 GLuint shader_programm;
 GLuint vao = 0;
@@ -98,7 +90,7 @@ void buttonCallback(GLFWwindow* window, int button, int action, int mods)
     mouse_old_y = y;
 }
 
-static void positionCallback(GLFWwindow* window, double x, double y)
+static void cursorCallback(GLFWwindow* window, double x, double y)
 {
     //hanlde the mouse motion for zooming and rotating the view
     float dx, dy;
@@ -134,96 +126,6 @@ std::string readFile(const char* fileName) {
     }
 
     return source;
-}
-
-
-
-int main(int argc, char** argv)
-{
-    GLFWwindow* window;
-    glfwSetErrorCallback(errorCallback);
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    window = glfwCreateWindow(640, 480, "Universe Simulator", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-    glfwSetKeyCallback(window, keyCallback);
-    glfwSetMouseButtonCallback(window, buttonCallback);
-    glfwSetCursorPosCallback(window, positionCallback);
-
-    printf("Hello, OpenCL\n");
-    //Setup OpenGL related things
-    initGL();
-
-    //initialize our CL object, this sets up the context
-    example = new CL();
-    
-    std::string kernel_source = readFile("gpu/vortex.cl");
-
-    example->loadProgram(kernel_source);
-
-    //initialize our particle system with positions, velocities and color
-    int num = NUM_PARTICLES;
-    std::vector<Vec4> pos(num);
-    std::vector<Vec4> vel(num);
-    std::vector<Vec4> color(num);
-
-    //fill our vectors with initial data
-    for(int i = 0; i < num; i++)
-    {
-        //distribute the particles in a random circle around z axis
-        float rad = randomFloat(.2, .5);
-        float x = rad*sin(2*3.14 * i/num);
-        float z = 0.0f;// -.1 + .2f * i/num;
-        float y = rad*cos(2*3.14 * i/num);
-        pos[i] = Vec4(x, y, z, 1.0f);
-        
-        //give some initial velocity
-        //float xr = rand_float(-.1, .1);
-        //float yr = rand_float(1.f, 3.f);
-        //the life is the lifetime of the particle: 1 = alive 0 = dead
-        //as you will see in part2.cl we reset the particle when it dies
-        float life_r = randomFloat(0.f, 1.f);
-        vel[i] = Vec4(0.0, 0.0, 3.0f, life_r);
-
-        //just make them red and full alpha
-        color[i] = Vec4(1.0f, 0.0f,0.0f, 1.0f);
-    }
-
-    //our load data function sends our initial values to the GPU
-    example->loadData(pos, vel, color);
-    //initialize the kernel
-    example->popCorn();
-    
-    while (!glfwWindowShouldClose(window))
-    {
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
-
-        projection = glm::perspective(90.0f,
-                                      (GLfloat)window_width / (GLfloat) window_height,
-                                      0.1f, 1000.f);
-
-        render();
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    exit(EXIT_SUCCESS);
 }
 
 void render()
@@ -319,4 +221,92 @@ void initGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
+}
+
+int main(int argc, char** argv)
+{
+    GLFWwindow* window;
+    glfwSetErrorCallback(errorCallback);
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    window = glfwCreateWindow(640, 480, "Universe Simulator", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+    glfwSetKeyCallback(window, keyCallback);
+    glfwSetMouseButtonCallback(window, buttonCallback);
+    glfwSetCursorPosCallback(window, cursorCallback);
+
+    printf("Hello, OpenCL\n");
+    //Setup OpenGL related things
+    initGL();
+
+    //initialize our CL object, this sets up the context
+    example = new CL();
+
+    std::string kernel_source = readFile("gpu/vortex.cl");
+
+    example->loadProgram(kernel_source);
+
+    //initialize our particle system with positions, velocities and color
+    int num = NUM_PARTICLES;
+    std::vector<Vec4> pos(num);
+    std::vector<Vec4> vel(num);
+    std::vector<Vec4> color(num);
+
+    //fill our vectors with initial data
+    for(int i = 0; i < num; i++)
+    {
+        //distribute the particles in a random circle around z axis
+        float rad = randomFloat(.2, .5);
+        float x = rad*sin(2*3.14 * i/num);
+        float z = 0.0f;// -.1 + .2f * i/num;
+        float y = rad*cos(2*3.14 * i/num);
+        pos[i] = Vec4(x, y, z, 1.0f);
+
+        //give some initial velocity
+        //float xr = rand_float(-.1, .1);
+        //float yr = rand_float(1.f, 3.f);
+        //the life is the lifetime of the particle: 1 = alive 0 = dead
+        //as you will see in part2.cl we reset the particle when it dies
+        float life_r = randomFloat(0.f, 1.f);
+        vel[i] = Vec4(0.0, 0.0, 3.0f, life_r);
+
+        //just make them red and full alpha
+        color[i] = Vec4(1.0f, 0.0f,0.0f, 1.0f);
+    }
+
+    //our load data function sends our initial values to the GPU
+    example->loadData(pos, vel, color);
+    //initialize the kernel
+    example->popCorn();
+
+    while (!glfwWindowShouldClose(window))
+    {
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+        glViewport(0, 0, width, height);
+
+        projection = glm::perspective(90.0f,
+                                      (GLfloat)window_width / (GLfloat) window_height,
+                                      0.1f, 1000.f);
+
+        render();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    exit(EXIT_SUCCESS);
 }
