@@ -4,16 +4,7 @@
 
 #include "Simulator.h"
 #include "util.h"
-
-#if defined __APPLE__ || defined(MACOSX)
-#else
-#if defined WIN32
-#else
-//needed for context sharing functions
 #include <GL/glx.h>
-#endif
-#endif
-
 
 
 Simulator::Simulator()
@@ -32,50 +23,6 @@ Simulator::Simulator()
     int t = devices.front().getInfo<CL_DEVICE_TYPE>();
     printf("type: device: %d CL_DEVICE_TYPE_GPU: %d \n", t, CL_DEVICE_TYPE_GPU);
 
-    // Define OS-specific context properties and create the OpenCL context
-    // We setup OpenGL context sharing slightly differently on each OS
-    // this code comes mostly from NVIDIA's SDK examples
-    // we could also check to see if the device supports GL sharing
-    // but that is just searching through the properties
-    // an example is avaible in the NVIDIA code
-#if defined (__APPLE__) || defined(MACOSX)
-    CGLContextObj kCGLContext = CGLGetCurrentContext();
-    CGLShareGroupObj kCGLShareGroup = CGLGetShareGroup(kCGLContext);
-    cl_context_properties props[] =
-    {
-        CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)kCGLShareGroup,
-        0
-    };
-    //Apple's implementation is weird, and the default values assumed by cl.hpp don't work
-    //this works
-    //cl_context cxGPUContext = clCreateContext(props, 0, 0, NULL, NULL, &err);
-    //these dont
-    //cl_context cxGPUContext = clCreateContext(props, 1,(cl_device_id*)&devices.front(), NULL, NULL, &err);
-    //cl_context cxGPUContext = clCreateContextFromType(props, CL_DEVICE_TYPE_GPU, NULL, NULL, &err);
-    //printf("error? %s\n", oclErrorString(err));
-    try{
-        context = cl::Context(props);   //had to edit line 1448 of cl.hpp to add this constructor
-    }
-    catch (cl::Error er) {
-        printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
-    }
-#else
-#if defined WIN32 // Win32
-    cl_context_properties props[] =
-    {
-        CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
-        CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
-        CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[0])(),
-        0
-    };
-    //cl_context cxGPUContext = clCreateContext(props, 1, &cdDevices[uiDeviceUsed], NULL, NULL, &err);
-    try{
-        context = cl::Context(CL_DEVICE_TYPE_GPU, props);
-    }
-    catch (cl::Error er) {
-        printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
-    }
-#else
     cl_context_properties props[] =
     {
         CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
@@ -90,8 +37,6 @@ Simulator::Simulator()
     catch (cl::Error er) {
         printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
     }
-#endif
-#endif
 
     //create the command queue we will use to execute OpenCL commands
     try{
