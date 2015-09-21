@@ -44,6 +44,7 @@ public:
 
     void updateModel();
     void updateProjection(int width, int height);
+    void updateMVP();
 
     void rotate(float x, float y);
     void translate(float z);

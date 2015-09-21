@@ -25,12 +25,6 @@ void Renderer::draw(GLuint positionVBO, GLuint colorVBO, int particleCount) {
   glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
   glVertexAttribPointer (1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
-  glm::mat4 mvp = projection * model;
-
-  GLint UniformMVP = glGetUniformLocation(shader_programm, "mvp");
-
-  glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &mvp[0][0]);
-
   glDrawArrays(GL_POINTS, 0, particleCount);
 }
 
@@ -109,6 +103,7 @@ void Renderer::updateModel() {
     model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
     model = glm::rotate(model, rotate_x, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, rotate_y, glm::vec3(0.0f, 1.0f, 0.0f));
+    updateMVP();
 }
 
 void Renderer::updateProjection(int width, int height) {
@@ -116,6 +111,13 @@ void Renderer::updateProjection(int width, int height) {
     float aspect = static_cast<GLfloat>(width)
             / static_cast<GLfloat>(height);
     projection = glm::perspective(90.0f, aspect, 0.1f, 1000.f);
+    updateMVP();
+}
+
+void Renderer::updateMVP() {
+    glm::mat4 mvp = projection * model;
+    GLint UniformMVP = glGetUniformLocation(shader_programm, "mvp");
+    glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &mvp[0][0]);
 }
 
 void Renderer::checkGlError(const char* file, int line) {
