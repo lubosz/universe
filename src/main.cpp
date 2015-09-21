@@ -176,7 +176,7 @@ int main(int argc, char** argv)
         float y = rad*cos(2*3.14 * i/num);
         pos[i] = Vec4(x, y, z, 1.0f);
         
-        //give some initial velocity 
+        //give some initial velocity
         //float xr = rand_float(-.1, .1);
         //float yr = rand_float(1.f, 3.f);
         //the life is the lifetime of the particle: 1 = alive 0 = dead
@@ -269,23 +269,23 @@ void init_gl(int argc, char** argv)
     printf ("OpenGL version supported %s\n", version);
 
     const char* vertex_shader =
-    "#version 400\n"
-    "in vec4 vp;"
-    "in vec4 cp;"
-    "uniform mat4 mvp;"
-    "out vec4 color;"
-    "void main () {"
-    "color = cp;"
-    "  gl_Position = mvp * vec4 (vp);"
-    "}";
+            "#version 400\n"
+            "in vec4 vp;"
+            "in vec4 cp;"
+            "uniform mat4 mvp;"
+            "out vec4 color;"
+            "void main () {"
+            "color = cp;"
+            "  gl_Position = mvp * vec4 (vp);"
+            "}";
 
     const char* fragment_shader =
-    "#version 400\n"
-    "in vec4 color;"
-    "out vec4 frag_colour;"
-    "void main () {"
-    "  frag_colour = color;"
-    "}";
+            "#version 400\n"
+            "in vec4 color;"
+            "out vec4 frag_colour;"
+            "void main () {"
+            "  frag_colour = color;"
+            "}";
 
     GLuint vs = glCreateShader (GL_VERTEX_SHADER);
     glShaderSource (vs, 1, &vertex_shader, NULL);

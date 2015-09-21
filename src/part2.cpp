@@ -28,7 +28,7 @@ void CL::loadData(std::vector<Vec4> pos, std::vector<Vec4> vel, std::vector<Vec4
     cl_velocities = cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
     cl_pos_gen = cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
     cl_vel_gen = cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
- 
+
     printf("Pushing data to the GPU\n");
     //push our CPU arrays to the GPU
     //data is tightly packed in std::vector starting with the adress of the first element
@@ -83,7 +83,7 @@ void CL::runKernel()
     float dt = .01f;
     kernel.setArg(5, dt); //pass in the timestep
     //execute the kernel
-    err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(num), cl::NullRange, NULL, &event); 
+    err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(num), cl::NullRange, NULL, &event);
     //printf("clEnqueueNDRangeKernel: %s\n", oclErrorString(err));
     queue.finish();
 
