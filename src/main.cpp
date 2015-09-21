@@ -231,7 +231,7 @@ GLFWwindow* initGLFW() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(640, 480, "Universe Simulator", NULL, NULL);
+    window = glfwCreateWindow(window_width, window_height, "Universe Simulator", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -249,6 +249,7 @@ GLFWwindow* initGLFW() {
 void initParticles(Simulator * simulator) {
     //initialize our particle system with positions, velocities and color
     int num = NUM_PARTICLES;
+    //int num = 1;
     std::vector<Vec4> pos(num);
     std::vector<Vec4> vel(num);
     std::vector<Vec4> color(num);
@@ -282,7 +283,6 @@ void initParticles(Simulator * simulator) {
 int main(int argc, char** argv)
 {
     GLFWwindow* window = initGLFW();
-    printf("Hello, OpenCL\n");
     //Setup OpenGL related things
     initGL();
 
@@ -295,7 +295,7 @@ int main(int argc, char** argv)
 
     initParticles(simulator);
     //initialize the kernel
-    simulator->popCorn();
+    simulator->initKernel();
 
     while (!glfwWindowShouldClose(window))
     {

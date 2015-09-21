@@ -1,4 +1,10 @@
-__kernel void part2(__global float4* pos, __global float4* color, __global float4* vel, __global float4* pos_gen, __global float4* vel_gen, float dt)
+__kernel void vortex(
+  __global float4* pos,
+  __global float4* color,
+  __global float4* vel,
+  __global float4* pos_gen,
+  __global float4* vel_gen,
+  float dt)
 {
     //get our index in the array
     unsigned int i = get_global_id(0);

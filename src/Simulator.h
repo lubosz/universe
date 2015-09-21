@@ -51,7 +51,7 @@ public:
     //setup the data for the kernel
     void loadData(std::vector<Vec4> pos, std::vector<Vec4> vel, std::vector<Vec4> color);
     //these are implemented in part1.cpp (in the future we will make these more general)
-    void popCorn();
+    void initKernel();
     //execute the kernel
     void runKernel();
 

@@ -48,9 +48,7 @@ Simulator::Simulator()
 
 }
 
-Simulator::~Simulator()
-{
-}
+Simulator::~Simulator() {}
 
 
 void Simulator::loadProgram(std::string kernel_source)
@@ -123,14 +121,11 @@ void Simulator::loadData(std::vector<Vec4> pos, std::vector<Vec4> vel, std::vect
     queue.finish();
 }
 
-void Simulator::popCorn()
+void Simulator::initKernel()
 {
-    printf("in popCorn\n");
     //initialize our kernel from the program
-    //kernel = clCreateKernel(program, "part1", &err);
-    //printf("clCreateKernel: %s\n", oclErrorString(err));
     try{
-        kernel = cl::Kernel(program, "part2", &err);
+        kernel = cl::Kernel(program, "vortex", &err);
     }
     catch (cl::Error er) {
         printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
@@ -151,7 +146,6 @@ void Simulator::popCorn()
     //Wait for the command queue to finish these commands before proceeding
     queue.finish();
 }
-
 
 
 void Simulator::runKernel()
