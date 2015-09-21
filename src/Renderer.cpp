@@ -78,8 +78,6 @@ void Renderer::initGL(int width, int height)
     }
     glError;
 
-    model = glm::mat4(1.0f);
-
     printContextInfo();
     initShaders();
 
@@ -87,11 +85,7 @@ void Renderer::initGL(int width, int height)
     glDisable(GL_DEPTH_TEST);
 
     updateProjection(width, height);
-
-    // set view matrix
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
+    updateModel();
 }
 
 void Renderer::bindVAO() {
@@ -107,10 +101,8 @@ void Renderer::translate(float y) {
     translate_z += y * 0.1;
 }
 
-void Renderer::updateView() {
-    // set view matrix
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+void Renderer::updateModel() {
+    model = glm::mat4(1.0f);
     model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
     model = glm::rotate(model, rotate_x, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, rotate_y, glm::vec3(0.0f, 1.0f, 0.0f));

@@ -42,7 +42,7 @@ public:
     void initGL(int width, int height);
     void bindVAO();
 
-    void updateView();
+    void updateModel();
     void updateProjection(int width, int height);
 
     void rotate(float x, float y);

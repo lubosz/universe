@@ -14,15 +14,6 @@
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sstream>
-#include <iomanip>
-#include <math.h>
-
-#include <iostream>
-
-
 #include "Renderer.h"
 #include "Simulator.h"
 #include "util.h"
@@ -83,7 +74,7 @@ static void cursorCallback(GLFWwindow* window, double x, double y)
     mouse_old_x = x;
     mouse_old_y = y;
 
-    renderer->updateView();
+    renderer->updateModel();
 }
 
 GLFWwindow* initGLFW() {
