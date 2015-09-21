@@ -70,6 +70,8 @@ public:
     cl_int err;
     ///cl_event event;
     cl::Event event;
+
+    static const char* oclErrorString(cl_int error);
 };
 
 #endif

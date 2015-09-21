@@ -50,6 +50,9 @@ public:
 
     void draw(GLuint positionVBO, GLuint colorVBO, int particleCount);
     static void checkGlError(const char* file, int line);
+
+    static GLuint createVBO(const void* data, int dataSize, GLenum target, GLenum usage);
+
 };
 
 #endif // RENDERER_H
