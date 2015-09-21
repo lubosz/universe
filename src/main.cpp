@@ -37,7 +37,7 @@
 #include "Renderer.h"
 
 #define NUM_PARTICLES 20000
-Simulator* example;
+Simulator* simulator;
 
 //GL related variables
 int window_width = 800;
@@ -135,7 +135,7 @@ void render()
     glBindVertexArray (vao);
 
     //this updates the particle system by calling the kernel
-    example->runKernel();
+    simulator->runKernel();
 
     //render the particles from VBOs
     glEnable(GL_BLEND);
@@ -145,11 +145,11 @@ void render()
     glGenVertexArrays (1, &vao);
     glBindVertexArray (vao);
     glEnableVertexAttribArray (0);
-    glBindBuffer(GL_ARRAY_BUFFER, example->p_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, simulator->p_vbo);
     glVertexAttribPointer (0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
     glEnableVertexAttribArray (1);
-    glBindBuffer(GL_ARRAY_BUFFER, example->c_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, simulator->c_vbo);
     glVertexAttribPointer (1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
     glm::mat4 mvp = projection * model;
@@ -158,7 +158,7 @@ void render()
 
     glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &mvp[0][0]);
 
-    glDrawArrays(GL_POINTS, 0, example->num);
+    glDrawArrays(GL_POINTS, 0, simulator->num);
 
 }
 
@@ -289,15 +289,15 @@ int main(int argc, char** argv)
     initGL();
 
     //initialize our CL object, this sets up the context
-    example = new Simulator();
+    simulator = new Simulator();
 
     std::string kernel_source = readFile("gpu/vortex.cl");
 
-    example->loadProgram(kernel_source);
+    simulator->loadProgram(kernel_source);
 
-    initParticles(example);
+    initParticles(simulator);
     //initialize the kernel
-    example->popCorn();
+    simulator->popCorn();
 
     while (!glfwWindowShouldClose(window))
     {
