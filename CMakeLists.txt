@@ -37,7 +37,6 @@ add_cxxflag("-std=c++14")
 ADD_EXECUTABLE(universe
   src/main.cpp
   src/Simulator.cpp
-  src/part2.cpp
   src/util.cpp)
 
 TARGET_LINK_LIBRARIES (universe
