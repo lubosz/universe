@@ -262,13 +262,19 @@ void init_gl(int argc, char** argv)
 {
     glewExperimental = GL_TRUE;
 
+        glError;
+
     GLenum glewError = glewInit();
+
+        glError;
 
     if (glewError != GLEW_OK)
     {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+
+        glError;
 
     model = glm::mat4(1.0f);
 
@@ -308,6 +314,8 @@ void init_gl(int argc, char** argv)
     glAttachShader (shader_programm, fs);
     glAttachShader (shader_programm, vs);
     glLinkProgram (shader_programm);
+
+    glError;
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDisable(GL_DEPTH_TEST);
