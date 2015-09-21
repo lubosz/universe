@@ -162,33 +162,7 @@ void render()
 
 }
 
-void initGL()
-{
-    glewExperimental = GL_TRUE;
-
-        glError;
-
-    GLenum glewError = glewInit();
-
-        glError;
-
-    if (glewError != GLEW_OK)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-
-        glError;
-
-    model = glm::mat4(1.0f);
-
-    // get version info
-    const GLubyte* renderer = glGetString (GL_RENDERER); // get renderer string
-    const GLubyte* version = glGetString (GL_VERSION); // version as a string
-    printf ("Renderer: %s\n", renderer);
-    printf ("OpenGL version supported %s\n", version);
-
-
+void initShaders() {
     shaders.push_back(readFile("gpu/MVP.vert"));
     shaders.push_back(readFile("gpu/color.frag"));
 
@@ -206,13 +180,37 @@ void initGL()
     glAttachShader (shader_programm, fs);
     glAttachShader (shader_programm, vs);
     glLinkProgram (shader_programm);
+}
+
+void printContextInfo() {
+    // get version info
+    const GLubyte* renderer = glGetString (GL_RENDERER); // get renderer string
+    const GLubyte* version = glGetString (GL_VERSION); // version as a string
+    printf ("Renderer: %s\n", renderer);
+    printf ("OpenGL version supported %s\n", version);
+}
+
+void initGL()
+{
+    glewExperimental = GL_TRUE;
+    GLenum glewError = glewInit();
+    if (glewError != GLEW_OK)
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    glError;
+
+    model = glm::mat4(1.0f);
+
+    printContextInfo();
+    initShaders();
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDisable(GL_DEPTH_TEST);
 
     // viewport
     glViewport(0, 0, window_width, window_height);
-
     projection = glm::perspective(90.0f,
                                   (GLfloat)window_width / (GLfloat) window_height,
                                   0.1f, 1000.f);
