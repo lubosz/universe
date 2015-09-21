@@ -10,7 +10,7 @@
 typedef struct Vec4
 {
     float x,y,z,w;
-    Vec4(){};
+    Vec4(){}
     //convenience functions
     Vec4(float xx, float yy, float zz, float ww):
         x(xx),
@@ -24,7 +24,8 @@ typedef struct Vec4
         z = zz;
         w = ww;
     }
-} Vec4 __attribute__((aligned(16)));
+} Vec4;
+//} Vec4 __attribute__((aligned(16)));
 
 class CL {
     public:
