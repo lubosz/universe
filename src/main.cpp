@@ -36,13 +36,12 @@
 #include "Simulator.h"
 #include "Renderer.h"
 
-#define NUM_PARTICLES 20000
+#define NUM_PARTICLES 200000
 Simulator* simulator;
 
 //GL related variables
-int window_width = 800;
-int window_height = 600;
-int glutWindowHandle = 0;
+int window_width = 1280;
+int window_height = 720;
 float translate_z = -1.f;
 // mouse controls
 int mouse_old_x, mouse_old_y;
