@@ -86,14 +86,6 @@ static void cursorCallback(GLFWwindow* window, double x, double y)
     renderer->updateView();
 }
 
-void render()
-{
-    renderer->bindVAO();
-    //this updates the particle system by calling the kernel
-    simulator->runKernel();
-    renderer->draw(simulator->positionVBO, simulator->colorVBO, simulator->particleCount);
-}
-
 GLFWwindow* initGLFW() {
     GLFWwindow* window;
     glfwSetErrorCallback(errorCallback);
@@ -119,7 +111,7 @@ GLFWwindow* initGLFW() {
     return window;
 }
 
-void initParticles(Simulator * simulator) {
+void initParticles() {
     //initialize our particle system with positions, velocities and color
     int num = NUM_PARTICLES;
     //int num = 1;
@@ -160,16 +152,13 @@ int main(int argc, char** argv)
     renderer = new Renderer();
     renderer->initGL(window_width, window_height);
 
-    //initialize our CL object, this sets up the context
-    simulator = new Simulator();
-
-
-
     std::string kernel_source = readFile("gpu/vortex.cl");
 
+    //initialize our CL object, this sets up the context
+    simulator = new Simulator();
     simulator->loadProgram(kernel_source);
 
-    initParticles(simulator);
+    initParticles();
     //initialize the kernel
     simulator->initKernel();
 
@@ -177,13 +166,11 @@ int main(int argc, char** argv)
     {
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
-
-        glViewport(0, 0, width, height);
-
-        renderer->updateProjection(window_width, window_height);
-
-        render();
-
+        renderer->updateProjection(width, height);
+        renderer->bindVAO();
+        //this updates the particle system by calling the kernel
+        simulator->runKernel();
+        renderer->draw(simulator->positionVBO, simulator->colorVBO, simulator->particleCount);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

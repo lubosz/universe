@@ -86,8 +86,6 @@ void Renderer::initGL(int width, int height)
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDisable(GL_DEPTH_TEST);
 
-    // viewport
-    glViewport(0, 0, width, height);
     updateProjection(width, height);
 
     // set view matrix
@@ -119,6 +117,7 @@ void Renderer::updateView() {
 }
 
 void Renderer::updateProjection(int width, int height) {
+    glViewport(0, 0, width, height);
     float aspect = static_cast<GLfloat>(width)
             / static_cast<GLfloat>(height);
     projection = glm::perspective(90.0f, aspect, 0.1f, 1000.f);
