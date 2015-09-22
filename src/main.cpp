@@ -100,7 +100,7 @@ GLFWwindow* initGLFW() {
         exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    //glfwSwapInterval(1);
     glfwSetKeyCallback(window, keyCallback);
     glfwSetMouseButtonCallback(window, buttonCallback);
     glfwSetScrollCallback(window, scrollCallback);
