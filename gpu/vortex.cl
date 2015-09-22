@@ -26,11 +26,12 @@ __kernel void vortex(
     //if the life is 0 or less we reset the particle's values back to the original values and set life to 1
     if(life <= 0)
     {
-        //p = pos_gen[i];
-        //v = vel_gen[i];
+        p = pos_gen[i];
+        v = vel_gen[i];
         life = 1.0;    
     }
 
+    /*
     float4 force = (float4)(0, 0, 0, 0);
     for (int j = 0; j < particle_count; j++) {
       float4
@@ -39,10 +40,11 @@ __kernel void vortex(
     }
 
     v += force*dt;
+    */
 
     //we use a first order euler method to integrate the velocity and position (i'll expand on this in another tutorial)
     //update the velocity to be affected by "gravity" in the z direction
-    //v.z -= 9.8*dt;
+    v.z -= 9.8*dt;
     //update the position with the new velocity
     p += v*dt;
     //store the updated life in the velocity array
@@ -54,6 +56,6 @@ __kernel void vortex(
 
     //you can manipulate the color based on properties of the system
     //here we adjust the alpha
-    //color[i].w = life;
+    color[i].w = life;
 
 }

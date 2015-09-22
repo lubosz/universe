@@ -12,7 +12,7 @@
 #include "util.h"
 #include <math.h>
 
-#define NUM_PARTICLES 200
+#define NUM_PARTICLES 200000
 
 Simulator* simulator;
 Renderer* renderer;
