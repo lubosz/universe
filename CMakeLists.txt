@@ -1,6 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 project(universe)
 
+set(glfw3_DIR /usr/lib/cmake/glfw)
+
 FIND_PACKAGE(OpenCL)
 FIND_PACKAGE(OpenGL)
 FIND_PACKAGE(glm)
