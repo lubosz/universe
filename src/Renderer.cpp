@@ -152,14 +152,27 @@ void Renderer::initShaders() {
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, vertex, NULL);
     glCompileShader(vs);
+    printShaderInfoLog(vs);
     GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fs, 1, fragment, NULL);
     glCompileShader(fs);
+    printShaderInfoLog(fs);
 
     shader_programm = glCreateProgram();
     glAttachShader(shader_programm, fs);
     glAttachShader(shader_programm, vs);
     glLinkProgram(shader_programm);
+}
+
+void Renderer::printShaderInfoLog(GLuint shader) {
+  int infologLen = 0;
+  glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infologLen);
+  if (infologLen > 1) {
+    GLchar * infoLog = new GLchar[infologLen];
+    glGetShaderInfoLog(shader, infologLen, NULL, infoLog);
+    std::cout << "Error compiling shader" << infoLog << "\n";
+    delete[] infoLog;
+  }
 }
 
 void Renderer::rotate(float x, float y) {

@@ -41,6 +41,7 @@ class Renderer {
     ~Renderer();
 
     void printContextInfo();
+    void printShaderInfoLog(GLuint shader);
     void initShaders();
     void initGL(int width, int height);
     void bindVAO();
