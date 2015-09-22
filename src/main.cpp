@@ -17,8 +17,9 @@
 #include "Renderer.h"
 #include "Simulator.h"
 #include "util.h"
+#include <math.h>
 
-#define NUM_PARTICLES 200000
+#define NUM_PARTICLES 200
 
 Simulator* simulator;
 Renderer* renderer;
@@ -122,9 +123,10 @@ void initParticles() {
     {
         //distribute the particles in a random circle around z axis
         float rad = randomFloat(.2, .5);
-        float x = rad*sin(2*3.14 * i/num);
+        //float rad = 1.0;
+        float x = rad * sin(2 * M_PI * i/num);
         float z = 0.0f;// -.1 + .2f * i/num;
-        float y = rad*cos(2*3.14 * i/num);
+        float y = rad * cos(2 * M_PI * i/num);
         pos[i] = Vec4(x, y, z, 1.0f);
 
         //give some initial velocity
@@ -132,8 +134,14 @@ void initParticles() {
         //float yr = rand_float(1.f, 3.f);
         //the life is the lifetime of the particle: 1 = alive 0 = dead
         //as you will see in part2.cl we reset the particle when it dies
-        float life_r = randomFloat(0.f, 1.f);
-        vel[i] = Vec4(0.0, 0.0, 3.0f, life_r);
+        //float life_r = randomFloat(0.f, 1.f);
+        //vel[i] = Vec4(0.0, 0.0, 3.0f, life_r);
+        vel[i] =
+                Vec4(
+                    randomFloat(-1.f, 1.f),
+                    randomFloat(-1.f, 1.f),
+                    randomFloat(-1.f, 1.f),
+                    1.0);
 
         //just make them red and full alpha
         color[i] = Vec4(1.0f, 0.0f,0.0f, 1.0f);
