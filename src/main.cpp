@@ -137,13 +137,9 @@ void initParticles() {
 int main(int argc, char** argv)
 {
     GLFWwindow* window = initGLFW();
-    //Setup OpenGL related things
-    renderer = new Renderer();
-    renderer->initGL(window_width, window_height);
+    renderer = new Renderer(window_width, window_height);
 
     std::string kernel_source = readFile("gpu/vortex.cl");
-
-    //initialize our CL object, this sets up the context
     simulator = new Simulator();
     simulator->loadProgram(kernel_source);
 
@@ -153,13 +149,11 @@ int main(int argc, char** argv)
 
     while (!glfwWindowShouldClose(window))
     {
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        renderer->updateProjection(width, height);
-        renderer->bindVAO();
         //this updates the particle system by calling the kernel
         simulator->runKernel();
-        renderer->draw(simulator->positionVBO, simulator->colorVBO, simulator->particleCount);
+        renderer->draw(simulator->positionVBO,
+                       simulator->colorVBO,
+                       simulator->particleCount);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

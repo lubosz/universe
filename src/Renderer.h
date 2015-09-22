@@ -14,8 +14,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-
-
 #define glError Renderer::checkGlError(__FILE__,__LINE__)
 
 
@@ -34,7 +32,7 @@ public:
     float rotate_x;
     float rotate_y;
 
-    Renderer();
+    Renderer(int width, int height);
     ~Renderer();
 
     void printContextInfo();

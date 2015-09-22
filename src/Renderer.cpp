@@ -2,11 +2,35 @@
 
 #include "util.h"
 
-Renderer::Renderer()
+Renderer::Renderer(int width, int height)
 {
     translate_z = -1.f;
     rotate_x = 0.0;
     rotate_y = 0.0;
+
+    glewExperimental = GL_TRUE;
+    GLenum glewError = glewInit();
+    if (glewError != GLEW_OK)
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    glError;
+
+    printContextInfo();
+    initShaders();
+    glUseProgram (shader_programm);
+
+    updateModel();
+    updateProjection(width, height);
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glPointSize(5.);
+
+    glBindVertexArray (vao);
 }
 
 Renderer::~Renderer() {}
@@ -54,37 +78,6 @@ void Renderer::initShaders() {
     glAttachShader (shader_programm, fs);
     glAttachShader (shader_programm, vs);
     glLinkProgram (shader_programm);
-}
-
-void Renderer::initGL(int width, int height)
-{
-    glewExperimental = GL_TRUE;
-    GLenum glewError = glewInit();
-    if (glewError != GLEW_OK)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    glError;
-
-    printContextInfo();
-    initShaders();
-    updateProjection(width, height);
-    updateModel();
-
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glDisable(GL_DEPTH_TEST);
-
-    glUseProgram (shader_programm);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glPointSize(5.);
-
-}
-
-void Renderer::bindVAO() {
-    glBindVertexArray (vao);
 }
 
 void Renderer::rotate(float x, float y) {
