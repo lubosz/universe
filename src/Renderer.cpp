@@ -1,17 +1,22 @@
+/*
+ * Universe
+ *
+ * Copyright 2015 Lubosz Sarnecki <lubosz@gmail.com>
+ *
+ */
+
 #include "Renderer.h"
 
 #include "util.h"
 
-Renderer::Renderer(int width, int height)
-{
+Renderer::Renderer(int width, int height) {
     translate_z = -1.f;
     rotate_x = 0.0;
     rotate_y = 0.0;
 
     glewExperimental = GL_TRUE;
     GLenum glewError = glewInit();
-    if (glewError != GLEW_OK)
-    {
+    if (glewError != GLEW_OK) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
@@ -19,7 +24,7 @@ Renderer::Renderer(int width, int height)
 
     printContextInfo();
     initShaders();
-    glUseProgram (shader_programm);
+    glUseProgram(shader_programm);
 
     updateModel();
     updateProjection(width, height);
@@ -28,36 +33,35 @@ Renderer::Renderer(int width, int height)
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glPointSize(5.);
+    // glPointSize(5.);
 
-    glBindVertexArray (vao);
+    glBindVertexArray(vao);
 }
 
 Renderer::~Renderer() {}
 
 void Renderer::draw(GLuint positionVBO, GLuint colorVBO, int particleCount) {
-  //render the particles from VBOs
+  // render the particles from VBOs
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glGenVertexArrays (1, &vao);
-  glBindVertexArray (vao);
-  glEnableVertexAttribArray (0);
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+  glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, positionVBO);
-  glVertexAttribPointer (0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
-  glEnableVertexAttribArray (1);
+  glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-  glVertexAttribPointer (1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
   glDrawArrays(GL_POINTS, 0, particleCount);
 }
 
 void Renderer::printContextInfo() {
-    // get version info
-    const GLubyte* renderer = glGetString (GL_RENDERER); // get renderer string
-    const GLubyte* version = glGetString (GL_VERSION); // version as a string
-    printf ("Renderer: %s\n", renderer);
-    printf ("OpenGL version supported %s\n", version);
+    const GLubyte* renderer = glGetString(GL_RENDERER);
+    const GLubyte* version = glGetString(GL_VERSION);
+    printf("Renderer: %s\n", renderer);
+    printf("OpenGL version supported %s\n", version);
 }
 
 void Renderer::initShaders() {
@@ -67,17 +71,17 @@ void Renderer::initShaders() {
     const char* vertex[] = {shaders[0].c_str()};
     const char* fragment[] = {shaders[1].c_str()};
 
-    GLuint vs = glCreateShader (GL_VERTEX_SHADER);
-    glShaderSource (vs, 1, vertex, NULL);
-    glCompileShader (vs);
-    GLuint fs = glCreateShader (GL_FRAGMENT_SHADER);
-    glShaderSource (fs, 1, fragment, NULL);
-    glCompileShader (fs);
+    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vs, 1, vertex, NULL);
+    glCompileShader(vs);
+    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fs, 1, fragment, NULL);
+    glCompileShader(fs);
 
-    shader_programm = glCreateProgram ();
-    glAttachShader (shader_programm, fs);
-    glAttachShader (shader_programm, vs);
-    glLinkProgram (shader_programm);
+    shader_programm = glCreateProgram();
+    glAttachShader(shader_programm, fs);
+    glAttachShader(shader_programm, vs);
+    glLinkProgram(shader_programm);
 }
 
 void Renderer::rotate(float x, float y) {
@@ -138,30 +142,34 @@ void Renderer::checkGlError(const char* file, int line) {
                 error = "Unknown error";
                 break;
         }
-        std::cout << "GL ERROR: GL_" << error << " " << file << " " << line << "\n";
+        std::cout
+                << "GL ERROR: GL_"
+                << error << " "
+                << file << " "
+                << line << "\n";
         err = glGetError();
     }
 }
 
-GLuint Renderer::createVBO(const void* data, int dataSize, GLenum target, GLenum usage)
-{
-    GLuint id = 0;  // 0 is reserved, glGenBuffersARB() will return non-zero id if success
+GLuint Renderer::createVBO(
+        const void* data,
+        int dataSize,
+        GLenum target,
+        GLenum usage) {
+    GLuint id;
+    glGenBuffers(1, &id);
+    glBindBuffer(target, id);
+    glBufferData(target, dataSize, data, usage);
 
-    glGenBuffers(1, &id);                        // create a vbo
-    glBindBuffer(target, id);                    // activate vbo id to use
-    glBufferData(target, dataSize, data, usage); // upload data to video card
-
-    // check data size in VBO is same as input array, if not return 0 and delete VBO
+    // check data size in VBO is same as input array
+    // if not return 0 and delete VBO
     int bufferSize = 0;
     glGetBufferParameteriv(target, GL_BUFFER_SIZE, &bufferSize);
-    if(dataSize != bufferSize)
-    {
+    if (dataSize != bufferSize) {
         glDeleteBuffers(1, &id);
         id = 0;
-        //cout << "[createVBO()] Data size is mismatch with input array\n";
-        printf("[createVBO()] Data size is mismatch with input array\n");
+        std::cout << "[createVBO()] Data size is mismatch with input array\n";
     }
-    //this was important for working inside blender!
     glBindBuffer(target, 0);
-    return id;      // return VBO id
+    return id;
 }

@@ -1,11 +1,17 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+/*
+ * Universe
+ *
+ * Copyright 2015 Lubosz Sarnecki <lubosz@gmail.com>
+ *
+ */
+
+#ifndef SRC_RENDERER_H_
+#define SRC_RENDERER_H_
 
 #include <string>
 #include <iostream>
 #include <vector>
 
-//OpenGL stuff
 #include <GL/glew.h>
 # define GLCOREARB_PROTOTYPES 1
 # define GL_GLEXT_PROTOTYPES 1
@@ -14,12 +20,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#define glError Renderer::checkGlError(__FILE__,__LINE__)
-
+#define glError Renderer::checkGlError(__FILE__, __LINE__)
 
 class Renderer {
-public:
-
+ public:
     GLuint shader_programm;
     GLuint vao = 0;
 
@@ -50,9 +54,12 @@ public:
     void draw(GLuint positionVBO, GLuint colorVBO, int particleCount);
     static void checkGlError(const char* file, int line);
 
-    static GLuint createVBO(const void* data, int dataSize, GLenum target, GLenum usage);
-
+    static GLuint createVBO(
+            const void* data,
+            int dataSize,
+            GLenum target,
+            GLenum usage);
 };
 
-#endif // RENDERER_H
+#endif  // SRC_RENDERER_H_
 

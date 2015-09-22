@@ -12,6 +12,7 @@ INCLUDE_DIRECTORIES(
     ${GLEW_INCLUDE_PATH}
     ${GLFW3_INCLUDE_PATH}
     ${GLM_INCLUDE_PATH}
+    ${CMAKE_SOURCE_DIR}/GSL
 )
 
 function(add_cxxflag FLAG)
@@ -83,7 +84,7 @@ else()
     set(PYTHON_VER "python")
 endif()
 
-set(IGNORE "-readability/streams")
+set(IGNORE "-readability/streams,-build/include")
 
 add_custom_target(lint
     COMMAND ${PYTHON_VER} cpplint.py --filter=${IGNORE} ${SOURCES}

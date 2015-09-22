@@ -1,3 +1,10 @@
+/*
+ * Universe
+ *
+ * Copyright 2015 Lubosz Sarnecki <lubosz@gmail.com>
+ *
+ */
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,9 +16,8 @@
 
 #include "util.h"
 
-float randomFloat(float mn, float mx)
-{
-    float r = random() / (float) RAND_MAX;
+float randomFloat(float mn, float mx) {
+    float r = random() / static_cast<float>(RAND_MAX);
     return mn + (mx-mn)*r;
 }
 
