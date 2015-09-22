@@ -31,6 +31,11 @@ int mouse_old_x, mouse_old_y;
 int mouse_buttons = 0;
 
 
+static void windowFrameBufferCallback(GLFWwindow * 	window, int width, int height) {
+    renderer->updateProjection(width, height);
+}
+
+
 static void errorCallback(int error, const char* description)
 {
     fputs(description, stderr);
@@ -39,6 +44,11 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    renderer->translate(yoffset);
 }
 
 void buttonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -66,9 +76,6 @@ static void cursorCallback(GLFWwindow* window, double x, double y)
 
     if (mouse_buttons & 1) {
         renderer->rotate(dx, dy);
-
-    } else if (mouse_buttons & 4) {
-        renderer->translate(dy);
     }
 
     mouse_old_x = x;
@@ -95,7 +102,9 @@ GLFWwindow* initGLFW() {
     glfwSwapInterval(1);
     glfwSetKeyCallback(window, keyCallback);
     glfwSetMouseButtonCallback(window, buttonCallback);
+    glfwSetScrollCallback(window, scrollCallback);
     glfwSetCursorPosCallback(window, cursorCallback);
+    glfwSetFramebufferSizeCallback(window, windowFrameBufferCallback);
 
     return window;
 }
