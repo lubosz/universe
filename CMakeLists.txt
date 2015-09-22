@@ -48,15 +48,43 @@ add_cxxflag("-Wlogical-op")
 add_cxxflag("-Woverflow")
 add_cxxflag("-Wredundant-decls")
 
-ADD_EXECUTABLE(universe
+SET(SOURCES
   src/main.cpp
+  src/Simulator.h
   src/Simulator.cpp
+  src/Renderer.h
   src/Renderer.cpp
-  src/util.cpp)
+  src/util.h
+  src/util.cpp
+)
+
+ADD_EXECUTABLE(universe ${SOURCES})
 
 TARGET_LINK_LIBRARIES (universe
    ${OPENGL_LIBRARIES}
    ${GLEW_LIBRARY}
    ${OpenCL_LIBRARY}
    ${GLFW3_LIBRARY}
+)
+
+if(EXISTS ${CMAKE_SOURCE_DIR}/cpplint.py)
+	message("cpplint.py found")
+else()
+	execute_process(
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND wget https://google-styleguide.googlecode.com/svn/trunk/cpplint/cpplint.py
+  )
+endif()
+
+#check code stlye
+if(EXISTS "/usr/bin/python2")
+    set(PYTHON_VER "python2")
+else()
+    set(PYTHON_VER "python")
+endif()
+
+set(IGNORE "-readability/streams")
+
+add_custom_target(lint
+    COMMAND ${PYTHON_VER} cpplint.py --filter=${IGNORE} ${SOURCES}
 )
