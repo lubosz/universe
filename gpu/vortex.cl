@@ -1,3 +1,7 @@
+__constant float GRAVITY = 0.000000000066742;
+__constant float mass = 1.0;
+
+
 __kernel void vortex(
   __global float4* pos,
   __global float4* color,
@@ -8,6 +12,7 @@ __kernel void vortex(
 {
     //get our index in the array
     unsigned int i = get_global_id(0);
+    unsigned int particle_count = get_global_size(0);
     //copy position and velocity for this iteration to a local variable
     //note: if we were doing many more calculations we would want to have opencl
     //copy to a local memory array to speed up memory access (this will be the subject of a later tutorial)
@@ -21,16 +26,25 @@ __kernel void vortex(
     //if the life is 0 or less we reset the particle's values back to the original values and set life to 1
     if(life <= 0)
     {
-        p = pos_gen[i];
-        v = vel_gen[i];
+        //p = pos_gen[i];
+        //v = vel_gen[i];
         life = 1.0;    
     }
 
+    float4 force = (float4)(0, 0, 0, 0);
+    for (int j = 0; j < particle_count; j++) {
+      float4
+      //force += GRAVITY * 1.0 / (p - pos[j]);
+      force += (float4)(0);
+    }
+
+    v += force*dt;
+
     //we use a first order euler method to integrate the velocity and position (i'll expand on this in another tutorial)
     //update the velocity to be affected by "gravity" in the z direction
-    v.z -= 9.8*dt;
+    //v.z -= 9.8*dt;
     //update the position with the new velocity
-    p.z += v.z*dt;
+    p += v*dt;
     //store the updated life in the velocity array
     v.w = life;
 
@@ -40,6 +54,6 @@ __kernel void vortex(
 
     //you can manipulate the color based on properties of the system
     //here we adjust the alpha
-    color[i].w = life;
+    //color[i].w = life;
 
 }
