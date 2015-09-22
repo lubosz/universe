@@ -158,7 +158,7 @@ void Simulator::runKernel()
     //this passes in the vector of VBO buffer objects (position and color)
     err = queue.enqueueAcquireGLObjects(&cl_vbos, NULL, &event);
     //printf("acquire: %s\n", oclErrorString(err));
-    queue.finish();
+    //queue.finish();
 
     float dt = .01f;
     kernel.setArg(5, dt); //pass in the timestep
