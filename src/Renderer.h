@@ -54,6 +54,8 @@ class Renderer {
     void draw(GLuint positionVBO, GLuint colorVBO, int particleCount);
     static void checkGlError(const char* file, int line);
 
+    GLuint initTexture(char const* Filename);
+
     static GLuint createVBO(
             const void* data,
             int dataSize,
