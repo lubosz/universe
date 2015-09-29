@@ -13,6 +13,6 @@ out gl_PerVertex {
 
 void main () {
   color = cp;
-  gl_PointSize = cp.a;
+  gl_PointSize = 20.0 * cp.a;
   gl_Position = mvp * vec4 (vp);
 };

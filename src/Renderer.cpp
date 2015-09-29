@@ -26,6 +26,9 @@ Renderer::Renderer(int width, int height) {
     initShaders();
     glUseProgram(shader_programm);
 
+    glEnable(GL_POINT_SPRITE);
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
     updateModel();
     updateProjection(width, height);
 
