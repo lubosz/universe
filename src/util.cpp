@@ -16,11 +16,6 @@
 
 #include "util.h"
 
-float randomFloat(float mn, float mx) {
-    float r = random() / static_cast<float>(RAND_MAX);
-    return mn + (mx-mn)*r;
-}
-
 std::string readFile(const char* fileName) {
     std::ifstream stream(fileName);
     std::string source((std::istreambuf_iterator<char>(stream)),

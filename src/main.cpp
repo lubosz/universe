@@ -11,8 +11,9 @@
 #include "Simulator.h"
 #include "util.h"
 #include <math.h>
+#include <random>
 
-#define NUM_PARTICLES 200000
+#define NUM_PARTICLES 10000
 
 Simulator* simulator;
 Renderer* renderer;
@@ -106,15 +107,21 @@ void initParticles() {
     std::vector<Vec4> vel(num);
     std::vector<Vec4> color(num);
 
+    std::random_device rd;
+    std::mt19937 e2(rd());
+    std::normal_distribution<> dist(0, 1.0);
+
     // fill our vectors with initial data
     for (int i = 0; i < num; i++) {
+        /*
         // distribute the particles in a random circle around z axis
         float rad = randomFloat(.2, .5);
         // float rad = 1.0;
         float x = rad * sin(2 * M_PI * i/num);
         float z = 0.0f;  // -.1 + .2f * i/num;
         float y = rad * cos(2 * M_PI * i/num);
-        pos[i] = Vec4(x, y, z, 1.0f);
+        */
+        pos[i] = Vec4(0, 0, 0, 1.0f);
 
         // give some initial velocity
         // float xr = rand_float(-.1, .1);
@@ -125,10 +132,10 @@ void initParticles() {
         // vel[i] = Vec4(0.0, 0.0, 3.0f, life_r);
         vel[i] =
                 Vec4(
-                    randomFloat(-1.f, 1.f),
-                    randomFloat(-1.f, 1.f),
-                    randomFloat(-1.f, 1.f),
-                    1.0);
+                    dist(e2),
+                    dist(e2),
+                    dist(e2),
+                    1);
 
         // just make them red and full alpha
         color[i] = Vec4(1.0f, 0.0f, 0.0f, 1.0f);

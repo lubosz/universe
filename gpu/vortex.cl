@@ -28,23 +28,27 @@ __kernel void vortex(
     {
         p = pos_gen[i];
         v = vel_gen[i];
-        life = 1.0;    
+        life = 10.0;
     }
 
-    /*
-    float4 force = (float4)(0, 0, 0, 0);
+
+    float4 force = (float4)(0, 0, 0, 1);
     for (int j = 0; j < particle_count; j++) {
-      float4
-      //force += GRAVITY * 1.0 / (p - pos[j]);
-      force += (float4)(0);
+      float4 distance = pos[j] - p;
+
+      if (length(distance) != 0) {
+        force += normalize(distance) * GRAVITY * 1.0 / (pow(length(distance),2));
+        color[i].y = 1.0;
+      }
+
     }
 
-    v += force*dt;
-    */
+    v += 10* force;
+
 
     //we use a first order euler method to integrate the velocity and position (i'll expand on this in another tutorial)
     //update the velocity to be affected by "gravity" in the z direction
-    v.z -= 9.8*dt;
+    //v.z -= 9.8*dt;
     //update the position with the new velocity
     p += v*dt;
     //store the updated life in the velocity array
