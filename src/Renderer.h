@@ -12,10 +12,11 @@
 #include <iostream>
 #include <vector>
 
-#include <GL/glew.h>
 # define GLCOREARB_PROTOTYPES 1
 # define GL_GLEXT_PROTOTYPES 1
-#include <GL/glcorearb.h>
+#include "GL/glcorearb.h"
+#include "GL/gl3w.h"
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

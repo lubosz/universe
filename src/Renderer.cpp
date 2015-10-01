@@ -15,19 +15,19 @@ Renderer::Renderer(int width, int height) {
     rotate_x = 0.0;
     rotate_y = 0.0;
 
-    glewExperimental = GL_TRUE;
-    GLenum glewError = glewInit();
-    if (glewError != GLEW_OK) {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
+    if (gl3wInit()) {
+        fprintf(stderr, "failed to initialize gl3w\n");
+        return;
     }
-    glError;
+    if (!gl3wIsSupported(4, 5)) {
+        fprintf(stderr, "OpenGL 4.5 not supported\n");
+        return;
+    }
 
     printContextInfo();
     initShaders();
     glUseProgram(shader_programm);
 
-    glEnable(GL_POINT_SPRITE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
     GLuint tex = initTexture("media/cloud.dds");
@@ -43,9 +43,10 @@ Renderer::Renderer(int width, int height) {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // glPointSize(5.);
 
     glBindVertexArray(vao);
+
+    glError;
 }
 
 Renderer::~Renderer() {}
@@ -68,10 +69,10 @@ void Renderer::draw(GLuint positionVBO, GLuint colorVBO, int particleCount) {
 }
 
 void Renderer::printContextInfo() {
-    const GLubyte* renderer = glGetString(GL_RENDERER);
-    const GLubyte* version = glGetString(GL_VERSION);
-    printf("Renderer: %s\n", renderer);
-    printf("OpenGL version supported %s\n", version);
+    printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
+    printf("GL_VERSION: %s\n", glGetString(GL_VERSION));
+    printf("GL_SHADING_LANGUAGE_VERSION: %s\n",
+           glGetString(GL_SHADING_LANGUAGE_VERSION));
 }
 
 GLuint Renderer::initTexture(char const* Filename) {

@@ -3,16 +3,14 @@ project(universe)
 
 FIND_PACKAGE(OpenCL)
 FIND_PACKAGE(OpenGL)
-FIND_PACKAGE(GLEW)
 FIND_PACKAGE(glm)
 FIND_PACKAGE(glfw3)
 
 INCLUDE_DIRECTORIES( 
     ${OPENGL_INCLUDE_DIR}
-    ${GLEW_INCLUDE_PATH}
     ${GLFW3_INCLUDE_PATH}
     ${GLM_INCLUDE_PATH}
-    ${CMAKE_SOURCE_DIR}/GSL
+    ${CMAKE_SOURCE_DIR}/gl3w/include/
 )
 
 function(add_cxxflag FLAG)
@@ -57,6 +55,7 @@ SET(SOURCES
   src/Renderer.cpp
   src/util.h
   src/util.cpp
+  gl3w/src/gl3w.c
 )
 
 ADD_EXECUTABLE(universe ${SOURCES})
@@ -66,6 +65,7 @@ TARGET_LINK_LIBRARIES (universe
    ${GLEW_LIBRARY}
    ${OpenCL_LIBRARY}
    ${GLFW3_LIBRARY}
+   dl
 )
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/cpplint.py)
