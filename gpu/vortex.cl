@@ -60,6 +60,6 @@ __kernel void vortex(
 
     //you can manipulate the color based on properties of the system
     //here we adjust the alpha
-    color[i].w = life;
+    //color[i].w = life;
 
 }

@@ -135,7 +135,7 @@ void initParticles() {
                     dist(e2),
                     dist(e2),
                     dist(e2),
-                    1);
+                    10);
 
         // just make them red and full alpha
         color[i] = Vec4(1.0f, 0.0f, 0.0f, 1.0f);

@@ -11,7 +11,7 @@
 #include <gli/gli.hpp>
 
 Renderer::Renderer(int width, int height) {
-    translate_z = -1.f;
+    translate_z = -0.1f;
     rotate_x = 0.0;
     rotate_y = 0.0;
 
@@ -177,7 +177,7 @@ void Renderer::updateProjection(int width, int height) {
     glViewport(0, 0, width, height);
     float aspect = static_cast<GLfloat>(width)
             / static_cast<GLfloat>(height);
-    projection = glm::perspective(90.0f, aspect, 0.1f, 1000.f);
+    projection = glm::perspective(45.0f, aspect, 0.1f, 1000.f);
     updateMVP();
 }
 
