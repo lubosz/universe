@@ -89,7 +89,7 @@ GLuint Renderer::initTexture(char const* Filename) {
     glBindTexture(Target, TextureName);
     glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(Target,
-                    GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+        GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 
     glm::tvec3<GLsizei> const Dimensions(Texture.dimensions());
     GLsizei const FaceTotal =
@@ -119,7 +119,8 @@ GLuint Renderer::initTexture(char const* Filename) {
                                 0, 0,
                                 Dimensions.x,
                                 Dimensions.y,
-                                Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
+                                Format.Internal,
+                                static_cast<GLsizei>(Texture.size(Level)),
                                 Texture.data(Layer, Face, Level));
                 else
                     glTexSubImage2D(
