@@ -2,6 +2,7 @@
 
 in vec4 vp;
 in vec4 cp;
+in float mp;
 uniform mat4 modelMatrix;
 uniform mat4 projectionMatrix;
 out vec4 color;
@@ -14,7 +15,8 @@ out gl_PerVertex {
 
 void main () {
   color = cp;
-  gl_PointSize = 50.0;
   vec4 position = modelMatrix * vec4 (vp);
+  float distance = -position.z;
   gl_Position = projectionMatrix * position;
+  gl_PointSize = 2 * mp / distance;
 };

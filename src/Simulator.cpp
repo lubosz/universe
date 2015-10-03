@@ -87,10 +87,10 @@ void Simulator::loadProgram(std::string kernel_source) {
               << std::endl;
 }
 
-void Simulator::loadData(
-        std::vector<Vec4> pos,
+void Simulator::loadData(std::vector<Vec4> pos,
         std::vector<Vec4> vel,
-        std::vector<Vec4> col) {
+        std::vector<Vec4> col,
+        std::vector<float> mass) {
     // store the number of particles and the size in bytes of our arrays
     particleCount = pos.size();
     array_size = particleCount * sizeof(Vec4);
@@ -99,7 +99,9 @@ void Simulator::loadData(
                 &pos[0], array_size, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
     colorVBO = Renderer::createVBO(
                 &col[0], array_size, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
-
+    massVBO = Renderer::createVBO(
+                mass.data(), particleCount * sizeof(GLfloat),
+                GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
     // make sure OpenGL is finished before we proceed
     glFinish();
     printf("gl interop!\n");
@@ -109,6 +111,8 @@ void Simulator::loadData(
     cl_vbos.push_back(cl::BufferGL(
                           context, CL_MEM_READ_WRITE, colorVBO, &err));
 
+    cl_vbos.push_back(cl::BufferGL(
+                          context, CL_MEM_READ_WRITE, massVBO, &err));
 
     // create the OpenCL only arrays
     velocityBuffer =
@@ -145,9 +149,10 @@ void Simulator::initKernel() {
     try {
         err = kernel.setArg(0, cl_vbos[0]);
         err = kernel.setArg(1, cl_vbos[1]);
-        err = kernel.setArg(2, velocityBuffer);
-        err = kernel.setArg(3, initialPositionBuffer);
-        err = kernel.setArg(4, initivalVelocityBuffer);
+        err = kernel.setArg(2, cl_vbos[2]);
+        err = kernel.setArg(3, velocityBuffer);
+        err = kernel.setArg(4, initialPositionBuffer);
+        err = kernel.setArg(5, initivalVelocityBuffer);
     }
     catch (cl::Error er) {
         printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
@@ -168,7 +173,7 @@ void Simulator::runKernel() {
 
     // pass in the timestep
     float dt = .01f;
-    kernel.setArg(5, dt);
+    kernel.setArg(6, dt);
     // execute the kernel
     err = queue.enqueueNDRangeKernel(
                 kernel,

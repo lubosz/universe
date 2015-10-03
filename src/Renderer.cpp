@@ -51,7 +51,8 @@ Renderer::Renderer(int width, int height) {
 
 Renderer::~Renderer() {}
 
-void Renderer::draw(GLuint positionVBO, GLuint colorVBO, int particleCount) {
+void Renderer::draw(GLuint positionVBO, GLuint colorVBO,
+                    GLuint massVBO, int particleCount) {
   // render the particles from VBOs
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -64,6 +65,10 @@ void Renderer::draw(GLuint positionVBO, GLuint colorVBO, int particleCount) {
   glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
   glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+
+  glEnableVertexAttribArray(2);
+  glBindBuffer(GL_ARRAY_BUFFER, massVBO);
+  glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, NULL);
 
   glDrawArrays(GL_POINTS, 0, particleCount);
 }

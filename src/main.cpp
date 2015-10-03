@@ -106,10 +106,16 @@ void initParticles() {
     std::vector<Vec4> pos(num);
     std::vector<Vec4> vel(num);
     std::vector<Vec4> color(num);
+    std::vector<GLfloat> mass(num);
 
     std::random_device rd;
     std::mt19937 e2(rd());
-    std::normal_distribution<> dist(0, 1.0);
+
+    std::normal_distribution<> velocityDist(0, .00001);
+    std::normal_distribution<> posDist(0, .1);
+    std::normal_distribution<> massDist(10, 9);
+    // std::uniform_real_distribution<> velocityDist(-.1, .1);
+    // std::normal_distribution<> massDist(10, 9.0);
 
     // fill our vectors with initial data
     for (int i = 0; i < num; i++) {
@@ -121,7 +127,12 @@ void initParticles() {
         float z = 0.0f;  // -.1 + .2f * i/num;
         float y = rad * cos(2 * M_PI * i/num);
         */
-        pos[i] = Vec4(0, 0, 0, 1.0f);
+
+        pos[i] = Vec4(posDist(e2),
+                      posDist(e2),
+                      posDist(e2), 1.0f);
+
+        mass[i] = fabs(massDist(e2));
 
         // give some initial velocity
         // float xr = rand_float(-.1, .1);
@@ -130,19 +141,42 @@ void initParticles() {
         // as you will see in part2.cl we reset the particle when it dies
         // float life_r = randomFloat(0.f, 1.f);
         // vel[i] = Vec4(0.0, 0.0, 3.0f, life_r);
+
+        /*
         vel[i] =
                 Vec4(
-                    dist(e2),
-                    dist(e2),
-                    dist(e2),
-                    10);
+                    velocityDist(e2),
+                    velocityDist(e2),
+                    velocityDist(e2),
+                    1);
+        */
 
+        vel[i] = Vec4(0, 0, 0, 1);
+        /*
+        glm::vec4 position(pos[i].x, pos[i].y, pos[i].z, 1.0);
+        float r = glm::length(position);
+        // float r = sqrt(pow(pos[i].x,2) + pow(pos[i].y,2) + pow(pos[i].z,2));
+
+
+        float theta = acos(pos[i].z/r);
+        float phi = atan2(pos[i].y, pos[i].x);
+
+        // then add pi/2 to theta or phi
+        theta += M_PI/2.0;
+
+             vel[i] =
+                        Vec4(
+                            sin(theta) * cos(phi),
+                            sin(theta) * sin(phi),
+                            cos(theta),
+                            1);
+        */
         // just make them red and full alpha
         color[i] = Vec4(1.0f, 0.0f, 0.0f, 1.0f);
     }
 
     // our load data function sends our initial values to the GPU
-    simulator->loadData(pos, vel, color);
+    simulator->loadData(pos, vel, color, mass);
 }
 
 int main(int argc, char** argv) {
@@ -160,6 +194,7 @@ int main(int argc, char** argv) {
         simulator->runKernel();
         renderer->draw(simulator->positionVBO,
                        simulator->colorVBO,
+                       simulator->massVBO,
                        simulator->particleCount);
         glfwSwapBuffers(window);
         glfwPollEvents();

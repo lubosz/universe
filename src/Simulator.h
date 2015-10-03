@@ -43,6 +43,7 @@ class Simulator {
 
     int positionVBO;
     int colorVBO;
+    int massVBO;
     int particleCount;
     size_t array_size;
 
@@ -53,7 +54,8 @@ class Simulator {
     void loadData(
             std::vector<Vec4> pos,
             std::vector<Vec4> vel,
-            std::vector<Vec4> color);
+            std::vector<Vec4> color,
+            std::vector<float> mass);
     void initKernel();
     void runKernel();
 
