@@ -96,6 +96,9 @@ GLuint Renderer::initTexture(char const* Filename) {
     glTexParameteri(Target,
         GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 
+    glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     glm::tvec3<GLsizei> const Dimensions(Texture.dimensions());
     GLsizei const FaceTotal =
             static_cast<GLsizei>(Texture.layers() * Texture.faces());

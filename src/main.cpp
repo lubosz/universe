@@ -13,13 +13,13 @@
 #include <math.h>
 #include <random>
 
-#define NUM_PARTICLES 10000
+#define NUM_PARTICLES 9000
 
 Simulator* simulator;
 Renderer* renderer;
 
-int window_width = 1280;
-int window_height = 720;
+int window_width = 1920;
+int window_height = 1080;
 
 int mouse_old_x, mouse_old_y;
 int mouse_buttons = 0;
