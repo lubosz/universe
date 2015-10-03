@@ -11,7 +11,7 @@
 #include <gli/gli.hpp>
 
 Renderer::Renderer(int width, int height) {
-    translate_z = -0.1f;
+    translate_z = -0.5f;
     rotate_x = 0.0;
     rotate_y = 0.0;
 
@@ -166,7 +166,7 @@ void Renderer::rotate(float x, float y) {
 }
 
 void Renderer::translate(float z) {
-    translate_z += z * 0.1;
+    translate_z += z * 0.01;
     updateModel();
 }
 
