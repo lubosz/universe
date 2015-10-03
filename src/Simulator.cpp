@@ -23,8 +23,20 @@ Simulator::Simulator() {
     printf("cl::Platform::get(): %s\n", oclErrorString(err));
     printf("platforms.size(): %ld\n", platforms.size());
 
+    for (auto platform : platforms) {
+        std::string platformName;
+        platform.getInfo(CL_PLATFORM_NAME, &platformName);
+        std::cout << platformName << "\n";
+    }
+
     deviceUsed = 0;
-    err = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+
+    try {
+        err = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+    } catch (cl::Error er) {
+        printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
+    }
+
     printf("getDevices: %s\n", oclErrorString(err));
     printf("devices.size(): %ld\n", devices.size());
     int t = devices.front().getInfo<CL_DEVICE_TYPE>();
