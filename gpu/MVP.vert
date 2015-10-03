@@ -1,4 +1,4 @@
-#version 400
+#version 150
 
 in vec4 vp;
 in vec4 cp;

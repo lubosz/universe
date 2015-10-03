@@ -1,4 +1,4 @@
-#version 400
+#version 150
 
 in vec4 color;
 uniform sampler2D cloud;
