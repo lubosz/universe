@@ -1,6 +1,21 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 project(universe)
 
+if(EXISTS ${CMAKE_SOURCE_DIR}/gl3w/gl3w_gen.py)
+  message("gl3w_gen.py found")
+else()
+  message("gl3w_gen.py not found")
+  execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND git submodule update --init gl3w)
+endif()
+
+if(EXISTS ${CMAKE_SOURCE_DIR}/gl3w/include/GL/gl3w.h)
+  message("gl3w_gen header generated.")
+else()
+  execute_process(WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/gl3w
+    COMMAND python gl3w_gen.py)
+endif()
+
 set(glfw3_DIR /usr/lib/cmake/glfw)
 
 FIND_PACKAGE(OpenCL)
