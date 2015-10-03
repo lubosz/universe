@@ -85,12 +85,11 @@ TARGET_LINK_LIBRARIES (universe
    dl
 )
 
-
 #check code stlye
 if(EXISTS "/usr/bin/python2")
-    set(PYTHON_VER "python2")
+    set(PYTHON2 "python2")
 else()
-    set(PYTHON_VER "python")
+    set(PYTHON2 "python")
 endif()
 
 set(IGNORE "-readability/streams,-build/include")
@@ -104,5 +103,5 @@ add_custom_target(lint
         COMMAND wget https://google-styleguide.googlecode.com/svn/trunk/cpplint/cpplint.py
       )
     endif()
-    COMMAND ${PYTHON_VER} cpplint.py --filter=${IGNORE} ${SOURCES}
+    COMMAND ${PYTHON2} cpplint.py --filter=${IGNORE} ${SOURCES}
 )
