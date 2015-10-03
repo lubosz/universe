@@ -177,14 +177,17 @@ void Renderer::updateProjection(int width, int height) {
     glViewport(0, 0, width, height);
     float aspect = static_cast<GLfloat>(width)
             / static_cast<GLfloat>(height);
-    projection = glm::perspective(45.0f, aspect, 0.1f, 1000.f);
+    projection = glm::perspective(45.0f, aspect, 0.01f, 10000.f);
     updateMVP();
 }
 
 void Renderer::updateMVP() {
-    glm::mat4 mvp = projection * model;
-    GLint UniformMVP = glGetUniformLocation(shader_programm, "mvp");
-    glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(
+                glGetUniformLocation(shader_programm, "modelMatrix"),
+                1, GL_FALSE, &model[0][0]);
+    glUniformMatrix4fv(
+                glGetUniformLocation(shader_programm, "projectionMatrix"),
+                1, GL_FALSE, &projection[0][0]);
 }
 
 void Renderer::checkGlError(const char* file, int line) {

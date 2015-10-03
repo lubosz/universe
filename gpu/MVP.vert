@@ -2,7 +2,8 @@
 
 in vec4 vp;
 in vec4 cp;
-uniform mat4 mvp;
+uniform mat4 modelMatrix;
+uniform mat4 projectionMatrix;
 out vec4 color;
 
 out gl_PerVertex {
@@ -13,6 +14,7 @@ out gl_PerVertex {
 
 void main () {
   color = cp;
-  gl_Position = mvp * vec4 (vp);
   gl_PointSize = 50.0;
+  vec4 position = modelMatrix * vec4 (vp);
+  gl_Position = projectionMatrix * position;
 };
