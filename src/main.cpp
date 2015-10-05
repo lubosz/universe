@@ -199,7 +199,7 @@ void initParticles() {
                     -sin(2 * M_PI * float(i)/float(num)),0, 1);
         glm::vec4 normalizedTanent = glm::normalize(tangent);
 
-        float acceleration = 0.0002;
+        float acceleration = 0.00005;
 
         vel[i] = Vec4(normalizedTanent.x * acceleration,
                       normalizedTanent.y * acceleration,
@@ -213,7 +213,7 @@ void initParticles() {
 
     pos[1] = Vec4(0,0,0,1);
     vel[1] = Vec4(0,0,0,1);
-    mass[1] = 20000;
+    mass[1] = 200000;
 
     // our load data function sends our initial values to the GPU
     simulator->loadData(pos, vel, color, mass);
