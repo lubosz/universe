@@ -1,3 +1,5 @@
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable
+
 __constant float GRAVITY = 0.000000000066742;
 
 
@@ -21,26 +23,22 @@ __kernel void vortex(
     float4 v = vel[i];
     float mass = masses[i];
 
-    float4 force = (float4)(0, 0, 0, 1);
-
-    gravity[i] = 0;
+    float4 accelerationDirection = (float4)(0, 0, 0, 0);
 
     //if (p.x != 0 && p.z != 0)
       for (int j = 0; j < particle_count; j++) {
         float4 distance = pos[j] - p;
-        if (length(distance) > 0.001) {
-          float grav = GRAVITY * masses[j] * mass / (pow(length(distance),2));
-          if (grav < 0)
-            grav = 0;
-          gravity[i] += grav;
-          force += normalize(distance) * grav;
+        if (length(distance) > 0.01) {
+          float acceleration = GRAVITY * masses[j] / (pow(length(distance),2));
+          accelerationDirection += normalize(distance) * acceleration;
           //force += normalize(distance) * GRAVITY / (pow(length(distance),2));
         }
       }
 
+    gravity[i] = length(accelerationDirection);
     //gravity[i] = force;
 
-    v += force;
+    v += accelerationDirection * dt;
     v.w = 1;
 
     //we use a first order euler method to integrate the velocity and position (i'll expand on this in another tutorial)

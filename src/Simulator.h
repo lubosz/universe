@@ -50,6 +50,7 @@ class Simulator {
     int particleCount;
     float* gravities;
     size_t array_size;
+    float dt;
 
     Simulator();
     ~Simulator();

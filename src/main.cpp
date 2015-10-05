@@ -13,7 +13,7 @@
 #include <math.h>
 #include <random>
 
-#define NUM_PARTICLES 10000
+#define NUM_PARTICLES 5000
 
 Simulator* simulator;
 Renderer* renderer;
@@ -36,6 +36,10 @@ static void keyCallback(
         GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+        simulator->dt = 100.0;
+    if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
+        simulator->dt = 10.0;
 }
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
@@ -99,6 +103,40 @@ GLFWwindow* initGLFW() {
     return window;
 }
 
+void initSolarSystem() {
+    std::vector<Vec4> pos;
+    std::vector<Vec4> vel;
+    std::vector<Vec4> color;
+    std::vector<GLfloat> mass;
+
+    //sun
+
+    pos.push_back(Vec4(0,0,0,1));
+    vel.push_back(Vec4(0,0,0,1));
+    color.push_back(Vec4(0,0,0,1));
+    mass.push_back(333000.0);
+
+    //2020 / 333000.0;
+
+    // earth
+    // distance ×10^8 km
+    pos.push_back(Vec4(1.470,0,0,1));
+    vel.push_back(Vec4(0,.005,0,1));
+    color.push_back(Vec4(0,0,0,1));
+    mass.push_back(1.0);
+
+
+    // jupiter
+    // Perihelion
+    pos.push_back(Vec4(7.405736,0,0,1));
+    vel.push_back(Vec4(0,-.005,0,1));
+    color.push_back(Vec4(0,0,0,1));
+    mass.push_back(317.8);
+
+
+    simulator->loadData(pos, vel, color, mass);
+}
+
 void initParticles() {
     // initialize our particle system with positions, velocities and color
     int num = NUM_PARTICLES;
@@ -111,26 +149,29 @@ void initParticles() {
     std::random_device rd;
     std::mt19937 e2(rd());
 
-    std::normal_distribution<> velocityDist(0, .00001);
-    std::normal_distribution<> posDist(0, .1);
-    std::uniform_real_distribution<> massDist(1, 100);
+    //std::normal_distribution<> velocityDist(0, .00001);
+    std::normal_distribution<> posDist(5, 2);
+    std::normal_distribution<> heightDist(0, .5);
+    std::uniform_real_distribution<> massDist(1, 1000);
     // std::uniform_real_distribution<> velocityDist(-.1, .1);
     // std::normal_distribution<> massDist(10, 9.0);
 
     // fill our vectors with initial data
     for (int i = 0; i < num; i++) {
-        /*
+
         // distribute the particles in a random circle around z axis
-        float rad = randomFloat(.2, .5);
+        float rad = posDist(e2);
+
+        /*
         // float rad = 1.0;
         float x = rad * sin(2 * M_PI * i/num);
         float z = 0.0f;  // -.1 + .2f * i/num;
         float y = rad * cos(2 * M_PI * i/num);
         */
 
-        pos[i] = Vec4(posDist(e2),
-                      posDist(e2),
-                      0, 1.0f);
+        pos[i] = Vec4(rad * sin(2 * M_PI * float(i)/float(num)),
+                      rad * cos(2 * M_PI * float(i)/float(num)),
+                      heightDist(e2), 1.0f);
 
         mass[i] = fabs(massDist(e2));
 
@@ -152,29 +193,28 @@ void initParticles() {
         */
 
         vel[i] = Vec4(0, 0, 0, 1);
-        /*
-        glm::vec4 position(pos[i].x, pos[i].y, pos[i].z, 1.0);
-        float r = glm::length(position);
-        // float r = sqrt(pow(pos[i].x,2) + pow(pos[i].y,2) + pow(pos[i].z,2));
+        glm::vec4 tangent =
+                glm::vec4(
+                    cos(2 * M_PI * float(i)/float(num)),
+                    -sin(2 * M_PI * float(i)/float(num)),0, 1);
+        glm::vec4 normalizedTanent = glm::normalize(tangent);
 
+        float acceleration = 0.0025;
 
-        float theta = acos(pos[i].z/r);
-        float phi = atan2(pos[i].y, pos[i].x);
+        vel[i] = Vec4(normalizedTanent.x * acceleration,
+                      normalizedTanent.y * acceleration,
+                      normalizedTanent.z * acceleration,
+                      1.0);
 
-        // then add pi/2 to theta or phi
-        theta += M_PI/2.0;
-
-             vel[i] =
-                        Vec4(
-                            sin(theta) * cos(phi),
-                            sin(theta) * sin(phi),
-                            cos(theta),
-                            1);
-        */
+        /**/
         // just make them red and full alpha
         color[i] = Vec4(1.0f, 0.0f, 0.0f, 1.0f);
     }
-
+/*
+    pos[1] = Vec4(0,0,0,1);
+    vel[1] = Vec4(0,0,0,1);
+    mass[1] = 2000;
+*/
     // our load data function sends our initial values to the GPU
     simulator->loadData(pos, vel, color, mass);
 }
@@ -188,6 +228,7 @@ int main(int argc, char** argv) {
     simulator->loadProgram(kernel_source);
 
     initParticles();
+    //initSolarSystem();
     simulator->initKernel();
 
     while (!glfwWindowShouldClose(window)) {

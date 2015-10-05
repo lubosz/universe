@@ -90,6 +90,7 @@ Simulator::Simulator() {
         printf("ERROR: %s(%d)\n", er.what(), er.err());
     }
     gravities = (float *)malloc(particleCount*sizeof(float));
+    dt = 10.0f;
 }
 
 Simulator::~Simulator() {}
@@ -215,7 +216,6 @@ void Simulator::runKernel() {
     err = queue.enqueueAcquireGLObjects(&cl_vbos, NULL, &event);
 
     // pass in the timestep
-    float dt = .01f;
     kernel.setArg(7, dt);
     // execute the kernel
     err = queue.enqueueNDRangeKernel(
@@ -228,7 +228,7 @@ void Simulator::runKernel() {
 /*
     queue.enqueueReadBuffer(gravityBuffer,false,0,particleCount*sizeof(float),gravities,NULL,NULL);
     for (int i=0; i < particleCount; i++) {
-            printf("gravities[%d] = %f\n", i, gravities[i]);
+            std::cout << "gravities[" <<  i << "] = " << gravities[i] << "\n";
     }
 */
     // Release the VBOs so OpenGL can play with them

@@ -11,7 +11,7 @@
 #include <gli/gli.hpp>
 
 Renderer::Renderer(int width, int height) {
-    translate_z = -1.5f;
+    translate_z = -15.5f;
     rotate_x = 0.0;
     rotate_y = 0.0;
 
@@ -38,6 +38,11 @@ Renderer::Renderer(int width, int height) {
 
     updateModel();
     updateProjection(width, height);
+
+    float pointSize[2];
+
+    glGetFloatv(GL_POINT_SIZE_RANGE, pointSize);
+    printf("Point Size Min %f Max %f\n", pointSize[0], pointSize[1]);
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDisable(GL_DEPTH_TEST);
@@ -182,7 +187,8 @@ void Renderer::rotate(float x, float y) {
 }
 
 void Renderer::translate(float z) {
-    translate_z += z * 0.01;
+    translate_z += z * 1.0;
+    //printf("translation z: %f\n",translate_z);
     updateModel();
 }
 
@@ -192,6 +198,13 @@ void Renderer::updateModel() {
     model = glm::rotate(model, rotate_x, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, rotate_y, glm::vec3(0.0f, 1.0f, 0.0f));
     updateMVP();
+/*
+    glm::vec4 position = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    float distance = -position.z;
+    printf("distance: %f\n", distance);
+    float gl_PointSize = 2000.0 / distance;
+    printf("gl_PointSize: %f\n", gl_PointSize);
+*/
 }
 
 void Renderer::updateProjection(int width, int height) {
