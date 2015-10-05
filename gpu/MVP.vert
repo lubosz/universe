@@ -6,6 +6,7 @@ in float mp;
 uniform mat4 modelMatrix;
 uniform mat4 projectionMatrix;
 out vec4 color;
+out float massColor;
 
 out gl_PerVertex {
     vec4 gl_Position;
@@ -19,4 +20,5 @@ void main () {
   float distance = -position.z;
   gl_Position = projectionMatrix * position;
   gl_PointSize = 2 * mp / distance;
+  massColor = mp / 2000;
 };

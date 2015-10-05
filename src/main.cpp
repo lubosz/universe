@@ -13,7 +13,7 @@
 #include <math.h>
 #include <random>
 
-#define NUM_PARTICLES 8000
+#define NUM_PARTICLES 10000
 
 Simulator* simulator;
 Renderer* renderer;
@@ -208,12 +208,12 @@ void initParticles() {
 
         /**/
         // just make them red and full alpha
-        color[i] = Vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        color[i] = Vec4(radius/30.0, 0.0f, 0.0f, 1.0f);
     }
 
     pos[1] = Vec4(0,0,0,1);
     vel[1] = Vec4(0,0,0,1);
-    mass[1] = 200000;
+    mass[1] = 20000;
 
     // our load data function sends our initial values to the GPU
     simulator->loadData(pos, vel, color, mass);

@@ -33,17 +33,15 @@ __kernel void vortex(
         if (masses[j] == 0)
           continue;
         float4 distance = pos[j] - p;
-        if (length(distance) > 0.5) {
+        if (length(distance) > 0.35) {
           float acceleration = GRAVITY * masses[j] / (pow(length(distance),2));
           accelerationDirection += normalize(distance) * acceleration;
-        }
-/*
-else if (length(distance) < 0.01 && masses[i] < masses[j]) {
+        } else if (length(distance) < 0.01 && masses[i] < masses[j]) {
               masses[j] += masses[i];
               vel[j] += vel[i] * masses[i] / masses[j];
               masses[i] = 0;
         }
-*/
+
 
       }
 
