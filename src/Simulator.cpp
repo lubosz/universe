@@ -90,7 +90,7 @@ Simulator::Simulator() {
         printf("ERROR: %s(%d)\n", er.what(), er.err());
     }
     gravities = (float *)malloc(particleCount*sizeof(float));
-    dt = 10.0f;
+    dt = 1000.0f;
 }
 
 Simulator::~Simulator() {}
@@ -163,8 +163,8 @@ void Simulator::loadData(std::vector<Vec4> pos,
             cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
     initivalVelocityBuffer =
             cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
-    gravityBuffer =
-            cl::Buffer(context, CL_MEM_WRITE_ONLY, particleCount * sizeof(float), NULL, &err);
+    //gravityBuffer =
+    //        cl::Buffer(context, CL_MEM_WRITE_ONLY, particleCount * sizeof(float), NULL, &err);
     printf("Pushing data to the GPU\n");
     // push our CPU arrays to the GPU
     // data is tightly packed in std::vector
@@ -196,7 +196,7 @@ void Simulator::initKernel() {
         err = kernel.setArg(3, velocityBuffer);
         err = kernel.setArg(4, initialPositionBuffer);
         err = kernel.setArg(5, initivalVelocityBuffer);
-        err = kernel.setArg(6, gravityBuffer);
+        //err = kernel.setArg(6, gravityBuffer);
     }
     catch (cl::Error er) {
         printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
@@ -216,7 +216,7 @@ void Simulator::runKernel() {
     err = queue.enqueueAcquireGLObjects(&cl_vbos, NULL, &event);
 
     // pass in the timestep
-    kernel.setArg(7, dt);
+    kernel.setArg(6, dt);
     // execute the kernel
     err = queue.enqueueNDRangeKernel(
                 kernel,

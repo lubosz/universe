@@ -13,7 +13,7 @@
 #include <math.h>
 #include <random>
 
-#define NUM_PARTICLES 5000
+#define NUM_PARTICLES 8000
 
 Simulator* simulator;
 Renderer* renderer;
@@ -150,7 +150,7 @@ void initParticles() {
     std::mt19937 e2(rd());
 
     //std::normal_distribution<> velocityDist(0, .00001);
-    std::normal_distribution<> posDist(5, 2);
+    std::normal_distribution<> posDist(7, 2);
     std::normal_distribution<> heightDist(0, .5);
     std::uniform_real_distribution<> massDist(1, 1000);
     // std::uniform_real_distribution<> velocityDist(-.1, .1);
@@ -199,7 +199,7 @@ void initParticles() {
                     -sin(2 * M_PI * float(i)/float(num)),0, 1);
         glm::vec4 normalizedTanent = glm::normalize(tangent);
 
-        float acceleration = 0.0025;
+        float acceleration = 0.0002;
 
         vel[i] = Vec4(normalizedTanent.x * acceleration,
                       normalizedTanent.y * acceleration,
@@ -210,11 +210,11 @@ void initParticles() {
         // just make them red and full alpha
         color[i] = Vec4(1.0f, 0.0f, 0.0f, 1.0f);
     }
-/*
+
     pos[1] = Vec4(0,0,0,1);
     vel[1] = Vec4(0,0,0,1);
-    mass[1] = 2000;
-*/
+    mass[1] = 20000;
+
     // our load data function sends our initial values to the GPU
     simulator->loadData(pos, vel, color, mass);
 }
