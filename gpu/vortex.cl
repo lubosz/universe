@@ -1,6 +1,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 
-__constant float GRAVITY = 0.0000000000000066742;
+__constant float GRAVITY = 0.000000000000066742;
 
 
 __kernel void vortex(
@@ -33,18 +33,17 @@ __kernel void vortex(
         if (masses[j] == 0)
           continue;
         float4 distance = pos[j] - p;
-        if (length(distance) > 0.01) {
+        if (length(distance) > 0.5) {
           float acceleration = GRAVITY * masses[j] / (pow(length(distance),2));
           accelerationDirection += normalize(distance) * acceleration;
         }
-
-
-        if (length(distance) < 0.01 && masses[i] < masses[j]) {
+/*
+else if (length(distance) < 0.01 && masses[i] < masses[j]) {
               masses[j] += masses[i];
               vel[j] += vel[i] * masses[i] / masses[j];
               masses[i] = 0;
         }
-
+*/
 
       }
 

@@ -150,9 +150,9 @@ void initParticles() {
     std::mt19937 e2(rd());
 
     //std::normal_distribution<> velocityDist(0, .00001);
-    std::normal_distribution<> posDist(7, 2);
-    std::normal_distribution<> heightDist(0, .5);
-    std::uniform_real_distribution<> massDist(1, 1000);
+    std::normal_distribution<> radiusDistribution(20, 10);
+    std::normal_distribution<> heightDistribution(0, .5);
+    std::uniform_real_distribution<> massDistribution(1, 1000);
     // std::uniform_real_distribution<> velocityDist(-.1, .1);
     // std::normal_distribution<> massDist(10, 9.0);
 
@@ -160,7 +160,7 @@ void initParticles() {
     for (int i = 0; i < num; i++) {
 
         // distribute the particles in a random circle around z axis
-        float rad = posDist(e2);
+        float radius = radiusDistribution(e2);
 
         /*
         // float rad = 1.0;
@@ -169,11 +169,11 @@ void initParticles() {
         float y = rad * cos(2 * M_PI * i/num);
         */
 
-        pos[i] = Vec4(rad * sin(2 * M_PI * float(i)/float(num)),
-                      rad * cos(2 * M_PI * float(i)/float(num)),
-                      heightDist(e2), 1.0f);
+        pos[i] = Vec4(radius * sin(2 * M_PI * float(i)/float(num)),
+                      radius * cos(2 * M_PI * float(i)/float(num)),
+                      heightDistribution(e2), 1.0f);
 
-        mass[i] = fabs(massDist(e2));
+        mass[i] = fabs(massDistribution(e2));
 
         // give some initial velocity
         // float xr = rand_float(-.1, .1);
@@ -199,7 +199,7 @@ void initParticles() {
                     -sin(2 * M_PI * float(i)/float(num)),0, 1);
         glm::vec4 normalizedTanent = glm::normalize(tangent);
 
-        float acceleration = 0.00005;
+        float acceleration = 0.0001 * (radius/30.0);
 
         vel[i] = Vec4(normalizedTanent.x * acceleration,
                       normalizedTanent.y * acceleration,
