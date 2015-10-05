@@ -11,7 +11,7 @@
 #include <gli/gli.hpp>
 
 Renderer::Renderer(int width, int height) {
-    translate_z = -0.5f;
+    translate_z = -1.5f;
     rotate_x = 0.0;
     rotate_y = 0.0;
 

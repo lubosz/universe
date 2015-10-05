@@ -40,6 +40,7 @@ class Simulator {
  public:
     std::vector<cl::Memory> cl_vbos;
     cl::Buffer velocityBuffer;
+    cl::Buffer gravityBuffer;
     cl::Buffer initialPositionBuffer;
     cl::Buffer initivalVelocityBuffer;
 
@@ -47,6 +48,7 @@ class Simulator {
     int colorVBO;
     int massVBO;
     int particleCount;
+    float* gravities;
     size_t array_size;
 
     Simulator();

@@ -8,6 +8,7 @@ __kernel void vortex(
   __global float4* vel,
   __global float4* pos_gen,
   __global float4* vel_gen,
+  __global float* gravity,
   float dt)
 {
     //get our index in the array
@@ -22,14 +23,22 @@ __kernel void vortex(
 
     float4 force = (float4)(0, 0, 0, 1);
 
-    if (p.x != 0 && p.y != 0 && p.z != 0)
+    gravity[i] = 0;
+
+    //if (p.x != 0 && p.z != 0)
       for (int j = 0; j < particle_count; j++) {
         float4 distance = pos[j] - p;
-        if (length(distance) != 0) {
-          force += normalize(distance) * GRAVITY * masses[j] * mass / (pow(length(distance),2));
+        if (length(distance) > 0.001) {
+          float grav = GRAVITY * masses[j] * mass / (pow(length(distance),2));
+          if (grav < 0)
+            grav = 0;
+          gravity[i] += grav;
+          force += normalize(distance) * grav;
           //force += normalize(distance) * GRAVITY / (pow(length(distance),2));
         }
       }
+
+    //gravity[i] = force;
 
     v += force;
     v.w = 1;

@@ -13,7 +13,7 @@
 #include <math.h>
 #include <random>
 
-#define NUM_PARTICLES 9000
+#define NUM_PARTICLES 10000
 
 Simulator* simulator;
 Renderer* renderer;
@@ -113,7 +113,7 @@ void initParticles() {
 
     std::normal_distribution<> velocityDist(0, .00001);
     std::normal_distribution<> posDist(0, .1);
-    std::normal_distribution<> massDist(10, 9);
+    std::uniform_real_distribution<> massDist(1, 100);
     // std::uniform_real_distribution<> velocityDist(-.1, .1);
     // std::normal_distribution<> massDist(10, 9.0);
 
@@ -130,7 +130,7 @@ void initParticles() {
 
         pos[i] = Vec4(posDist(e2),
                       posDist(e2),
-                      posDist(e2), 1.0f);
+                      0, 1.0f);
 
         mass[i] = fabs(massDist(e2));
 
