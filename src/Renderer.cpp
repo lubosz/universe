@@ -200,7 +200,6 @@ void Renderer::rotate(float x, float y) {
 
 void Renderer::translate(float z) {
     translate_z += z * 1.0;
-    //printf("translation z: %f\n",translate_z);
     updateModel();
 }
 

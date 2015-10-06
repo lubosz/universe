@@ -109,28 +109,28 @@ void initSolarSystem() {
     std::vector<Vec4> color;
     std::vector<GLfloat> mass;
 
-    //sun
+    // sun
 
-    pos.push_back(Vec4(0,0,0,1));
-    vel.push_back(Vec4(0,0,0,1));
-    color.push_back(Vec4(0,0,0,1));
+    pos.push_back(Vec4(0, 0, 0, 1));
+    vel.push_back(Vec4(0, 0, 0, 1));
+    color.push_back(Vec4(0, 0, 0, 1));
     mass.push_back(333000.0);
 
-    //2020 / 333000.0;
+    // 2020 / 333000.0;
 
     // earth
     // distance ×10^8 km
-    pos.push_back(Vec4(1.470,0,0,1));
-    vel.push_back(Vec4(0,.005,0,1));
-    color.push_back(Vec4(0,0,0,1));
+    pos.push_back(Vec4(1.470, 0, 0, 1));
+    vel.push_back(Vec4(0, .005, 0, 1));
+    color.push_back(Vec4(0, 0, 0, 1));
     mass.push_back(1.0);
 
 
     // jupiter
     // Perihelion
-    pos.push_back(Vec4(7.405736,0,0,1));
-    vel.push_back(Vec4(0,-.005,0,1));
-    color.push_back(Vec4(0,0,0,1));
+    pos.push_back(Vec4(7.405736, 0, 0 , 1));
+    vel.push_back(Vec4(0, -.005, 0, 1));
+    color.push_back(Vec4(0, 0, 0, 1));
     mass.push_back(317.8);
 
 
@@ -149,7 +149,7 @@ void initParticles() {
     std::random_device rd;
     std::mt19937 e2(rd());
 
-    //std::normal_distribution<> velocityDist(0, .00001);
+    // std::normal_distribution<> velocityDist(0, .00001);
     std::normal_distribution<> radiusDistribution(20, 10);
     std::normal_distribution<> heightDistribution(0, .5);
     std::uniform_real_distribution<> massDistribution(1, 1000);
@@ -158,7 +158,6 @@ void initParticles() {
 
     // fill our vectors with initial data
     for (int i = 0; i < num; i++) {
-
         // distribute the particles in a random circle around z axis
         float radius = radiusDistribution(e2);
 
@@ -169,8 +168,11 @@ void initParticles() {
         float y = rad * cos(2 * M_PI * i/num);
         */
 
-        pos[i] = Vec4(radius * sin(2 * M_PI * float(i)/float(num)),
-                      radius * cos(2 * M_PI * float(i)/float(num)),
+        float arrayPositionRatio =
+                static_cast<float>(i) / static_cast<float>(num);
+
+        pos[i] = Vec4(radius * sin(2 * M_PI * arrayPositionRatio),
+                      radius * cos(2 * M_PI * arrayPositionRatio),
                       heightDistribution(e2), 1.0f);
 
         mass[i] = fabs(massDistribution(e2));
@@ -195,24 +197,23 @@ void initParticles() {
         vel[i] = Vec4(0, 0, 0, 1);
         glm::vec4 tangent =
                 glm::vec4(
-                    cos(2 * M_PI * float(i)/float(num)),
-                    -sin(2 * M_PI * float(i)/float(num)),0, 1);
+                    cos(2 * M_PI * arrayPositionRatio),
+                    -sin(2 * M_PI * arrayPositionRatio), 0, 1);
         glm::vec4 normalizedTanent = glm::normalize(tangent);
 
-        float acceleration = 0.0001 * (radius/30.0);
+        float acceleration = 0.0001 * (radius / 30.0);
 
         vel[i] = Vec4(normalizedTanent.x * acceleration,
                       normalizedTanent.y * acceleration,
                       normalizedTanent.z * acceleration,
                       1.0);
 
-        /**/
         // just make them red and full alpha
         color[i] = Vec4(radius/30.0, 0.0f, 0.0f, 1.0f);
     }
 
-    pos[1] = Vec4(0,0,0,1);
-    vel[1] = Vec4(0,0,0,1);
+    pos[1] = Vec4(0, 0, 0, 1);
+    vel[1] = Vec4(0, 0, 0, 1);
     mass[1] = 20000;
 
     // our load data function sends our initial values to the GPU
@@ -228,7 +229,7 @@ int main(int argc, char** argv) {
     simulator->loadProgram(kernel_source);
 
     initParticles();
-    //initSolarSystem();
+    // initSolarSystem();
     simulator->initKernel();
 
     while (!glfwWindowShouldClose(window)) {

@@ -51,18 +51,20 @@ Simulator::Simulator() {
                    platformName.c_str(), er.what(), oclErrorString(er.err()));
             continue;
         }
-        printf("=== %s (%ld Devices) ===\n", platformName.c_str(), devices.size());
+        printf("=== %s (%ld Devices) ===\n",
+               platformName.c_str(), devices.size());
         for (auto device : devices) {
             string type = deviceTypeToString(device.getInfo<CL_DEVICE_TYPE>());
             string deviceName = device.getInfo<CL_DEVICE_NAME>();
             printf("%s: %s\n", type.c_str(), deviceName.c_str());
 
-            //if (deviceName.compare("Intel(R) Core(TM) i7-4550U CPU @ 1.50GHz") == 0) {
-            //if (deviceName.compare("Intel(R) HD Graphics Haswell Ultrabook GT3 Mobile") == 0) {
-                currentPlatform = platform;
-                currentDevice = device;
-            //}
-
+            currentPlatform = platform;
+            currentDevice = device;
+            /*
+            if (deviceName.compare(
+             "Intel(R) HD Graphics Haswell Ultrabook GT3 Mobile") == 0) {
+            }
+            */
         }
     }
 
@@ -80,7 +82,8 @@ Simulator::Simulator() {
     try {
         context = cl::Context(CL_DEVICE_TYPE_GPU, props);
     } catch (cl::Error er) {
-        printf("ERROR: Could not create CL context. %s(%s) %d\n", er.what(), oclErrorString(er.err()), er.err());
+        printf("ERROR: Could not create CL context. %s(%s) %d\n",
+               er.what(), oclErrorString(er.err()), er.err());
     }
 
     // create the command queue we will use to execute OpenCL commands
@@ -163,8 +166,9 @@ void Simulator::loadData(std::vector<Vec4> pos,
             cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
     initivalVelocityBuffer =
             cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
-    //gravityBuffer =
-    //        cl::Buffer(context, CL_MEM_WRITE_ONLY, particleCount * sizeof(float), NULL, &err);
+    // gravityBuffer =
+    // cl::Buffer(context, CL_MEM_WRITE_ONLY,
+    // particleCount * sizeof(float), NULL, &err);
     printf("Pushing data to the GPU\n");
     // push our CPU arrays to the GPU
     // data is tightly packed in std::vector
@@ -196,7 +200,7 @@ void Simulator::initKernel() {
         err = kernel.setArg(3, velocityBuffer);
         err = kernel.setArg(4, initialPositionBuffer);
         err = kernel.setArg(5, initivalVelocityBuffer);
-        //err = kernel.setArg(6, gravityBuffer);
+        //  err = kernel.setArg(6, gravityBuffer);
     }
     catch (cl::Error er) {
         printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
