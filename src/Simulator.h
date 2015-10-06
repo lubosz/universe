@@ -8,6 +8,8 @@
 #ifndef SRC_SIMULATOR_H_
 #define SRC_SIMULATOR_H_
 
+#include "GL/gl3w.h"
+
 #define __CL_ENABLE_EXCEPTIONS
 #include "CL/cl.hpp"
 
