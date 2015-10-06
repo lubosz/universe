@@ -147,6 +147,17 @@ GLuint Renderer::initTexture(char const* Filename) {
     return TextureName;
 }
 
+static void printProgramInfoLog(GLuint program) {
+  int infologLen = 0;
+  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infologLen);
+  if (infologLen > 1) {
+    GLchar * infoLog = new GLchar[infologLen];
+    glGetProgramInfoLog(program, infologLen, NULL, infoLog);
+    std::cout << "Error compiling program" << infoLog << "\n";
+    delete[] infoLog;
+  }
+}
+
 void Renderer::initShaders() {
     shaders.push_back(readFile("gpu/MVP.vert"));
     shaders.push_back(readFile("gpu/color.frag"));
@@ -167,6 +178,7 @@ void Renderer::initShaders() {
     glAttachShader(shader_programm, fs);
     glAttachShader(shader_programm, vs);
     glLinkProgram(shader_programm);
+    printProgramInfoLog(shader_programm);
 }
 
 void Renderer::printShaderInfoLog(GLuint shader) {
