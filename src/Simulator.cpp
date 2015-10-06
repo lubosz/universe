@@ -89,7 +89,7 @@ Simulator::Simulator() {
     } catch (cl::Error er) {
         printf("ERROR: %s(%d)\n", er.what(), er.err());
     }
-    gravities = (float *)malloc(particleCount*sizeof(float));
+    // gravities = (float *)malloc(particleCount*sizeof(float));
     dt = 1000.0f;
 }
 
