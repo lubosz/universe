@@ -8,12 +8,14 @@
 #include "Renderer.h"
 
 #include "util.h"
+#include "options.h"
+#include <math.h>
 #include <gli/gli.hpp>
 
 Renderer::Renderer(int width, int height) {
-    translate_z = -15.5f;
-    rotate_x = 0.0;
-    rotate_y = 0.0;
+    scrollPosition = -2.5;
+    theta = 1.8;
+    phi = 0;
 
     if (gl3wInit()) {
         fprintf(stderr, "failed to initialize gl3w\n");
@@ -36,7 +38,7 @@ Renderer::Renderer(int width, int height) {
     GLint texLoc = glGetUniformLocation(shader_programm, "cloud");
     glUniform1i(texLoc, tex-1);
 
-    updateModel();
+    updateView();
     updateProjection(width, height);
 
     float pointSize[2];
@@ -193,29 +195,33 @@ void Renderer::printShaderInfoLog(GLuint shader) {
 }
 
 void Renderer::rotate(float x, float y) {
-    rotate_x += y * 0.2;
-    rotate_y += x * 0.2;
-    updateModel();
+    theta += y * 0.002;
+    phi += x * 0.002;
+    updateView();
 }
 
 void Renderer::translate(float z) {
-    translate_z += z * 1.0;
-    updateModel();
+    scrollPosition += z * 0.05;
+    updateView();
 }
 
-void Renderer::updateModel() {
-    model = glm::mat4(1.0f);
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, translate_z));
-    model = glm::rotate(model, rotate_x, glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, rotate_y, glm::vec3(0.0f, 1.0f, 0.0f));
-    updateMVP();
-/*
-    glm::vec4 position = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    float distance = -position.z;
-    printf("distance: %f\n", distance);
-    float gl_PointSize = 2000.0 / distance;
-    printf("gl_PointSize: %f\n", gl_PointSize);
-*/
+void Renderer::updateView() {
+    float radius = exp(-scrollPosition);
+    glm::vec3 center(0, 0, 0);
+    glm::vec3 up(0, 0, -1);
+
+    glm::vec3 eye(radius * sin(theta) * cos(phi),
+                  radius * sin(theta) * sin(phi),
+                  radius * cos(theta));
+
+    // printf("theta %f phi %f scrollPosition %f\n",
+    //   theta, phi, scrollPosition);
+
+    view = glm::lookAt(eye, center, up);
+
+    glUniformMatrix4fv(
+                glGetUniformLocation(shader_programm, "viewMatrix"),
+                1, GL_FALSE, &view[0][0]);
 }
 
 void Renderer::updateProjection(int width, int height) {
@@ -223,13 +229,6 @@ void Renderer::updateProjection(int width, int height) {
     float aspect = static_cast<GLfloat>(width)
             / static_cast<GLfloat>(height);
     projection = glm::perspective(45.0f, aspect, 0.01f, 10000.f);
-    updateMVP();
-}
-
-void Renderer::updateMVP() {
-    glUniformMatrix4fv(
-                glGetUniformLocation(shader_programm, "modelMatrix"),
-                1, GL_FALSE, &model[0][0]);
     glUniformMatrix4fv(
                 glGetUniformLocation(shader_programm, "projectionMatrix"),
                 1, GL_FALSE, &projection[0][0]);

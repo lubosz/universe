@@ -28,14 +28,14 @@ class Renderer {
     GLuint shader_programm;
     GLuint vao = 0;
 
-    glm::mat4 model;
+    glm::mat4 view;
     glm::mat4 projection;
 
     std::vector<std::string> shaders;
 
-    float translate_z;
-    float rotate_x;
-    float rotate_y;
+    float scrollPosition;
+    float theta;
+    float phi;
 
     Renderer(int width, int height);
     ~Renderer();
@@ -46,9 +46,8 @@ class Renderer {
     void initGL(int width, int height);
     void bindVAO();
 
-    void updateModel();
+    void updateView();
     void updateProjection(int width, int height);
-    void updateMVP();
 
     void rotate(float x, float y);
     void translate(float z);
