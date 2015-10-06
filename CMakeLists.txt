@@ -94,14 +94,15 @@ endif()
 
 set(IGNORE "-readability/streams,-build/include")
 
-add_custom_target(lint
-    if(EXISTS ${CMAKE_SOURCE_DIR}/cpplint.py)
-	    message("cpplint.py found")
-    else()
-	    execute_process(
+if(EXISTS ${CMAKE_SOURCE_DIR}/cpplint.py)
+      message("cpplint.py found")
+else()
+      execute_process(
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMAND wget https://google-styleguide.googlecode.com/svn/trunk/cpplint/cpplint.py
       )
-    endif()
+endif()
+
+add_custom_target(lint
     COMMAND ${PYTHON2} cpplint.py --filter=${IGNORE} ${SOURCES}
 )
