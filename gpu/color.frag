@@ -1,4 +1,4 @@
-#version 150
+#version 400
 
 in vec4 color;
 in float massColor;
