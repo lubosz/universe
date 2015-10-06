@@ -14,33 +14,57 @@
 #include "util.h"
 #include <GL/glx.h>
 
+using std::string;
+
+static std::string deviceTypeToString(int type) {
+    switch (type) {
+    case CL_DEVICE_TYPE_DEFAULT:
+        return "CL_DEVICE_TYPE_DEFAULT";
+    case CL_DEVICE_TYPE_GPU:
+        return "CL_DEVICE_TYPE_GPU";
+    case CL_DEVICE_TYPE_CPU:
+        return "CL_DEVICE_TYPE_CPU";
+    default:
+        return std::to_string(type);
+    }
+}
 
 Simulator::Simulator() {
-    printf("Initialize OpenCL object and context\n");
-    // setup devices and context
     std::vector<cl::Platform> platforms;
+    cl::Platform currentPlatform;
     err = cl::Platform::get(&platforms);
-    printf("cl::Platform::get(): %s\n", oclErrorString(err));
-    printf("platforms.size(): %ld\n", platforms.size());
 
+    if (err != CL_SUCCESS) {
+        printf("Error getting platforms: %s\n", oclErrorString(err));
+        exit(0);
+    }
+
+    printf("Available Platforms (%ld):\n", platforms.size());
     for (auto platform : platforms) {
-        std::string platformName;
+        string platformName;
+        std::vector<cl::Device> devices;
         platform.getInfo(CL_PLATFORM_NAME, &platformName);
-        std::cout << platformName << "\n";
+        try {
+            platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
+        } catch (cl::Error er) {
+            printf("ERROR: Could not get Devices for Platform '%s'. %s(%s)\n",
+                   platformName.c_str(), er.what(), oclErrorString(er.err()));
+            continue;
+        }
+        printf("=== %s (%ld Devices) ===\n", platformName.c_str(), devices.size());
+        for (auto device : devices) {
+            string type = deviceTypeToString(device.getInfo<CL_DEVICE_TYPE>());
+            string deviceName = device.getInfo<CL_DEVICE_NAME>();
+            printf("%s: %s\n", type.c_str(), deviceName.c_str());
+
+            //if (deviceName.compare("Intel(R) Core(TM) i7-4550U CPU @ 1.50GHz") == 0) {
+            if (deviceName.compare("Intel(R) HD Graphics Haswell Ultrabook GT3 Mobile") == 0) {
+                currentPlatform = platform;
+                currentDevice = device;
+            }
+
+        }
     }
-
-    deviceUsed = 0;
-
-    try {
-        err = platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
-    } catch (cl::Error er) {
-        printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
-    }
-
-    printf("getDevices: %s\n", oclErrorString(err));
-    printf("devices.size(): %ld\n", devices.size());
-    int t = devices.front().getInfo<CL_DEVICE_TYPE>();
-    printf("type: device: %d CL_DEVICE_TYPE_GPU: %d \n", t, CL_DEVICE_TYPE_GPU);
 
     cl_context_properties props[] = {
         CL_GL_CONTEXT_KHR,
@@ -48,7 +72,7 @@ Simulator::Simulator() {
         CL_GLX_DISPLAY_KHR,
         reinterpret_cast<cl_context_properties>(glXGetCurrentDisplay()),
         CL_CONTEXT_PLATFORM,
-        reinterpret_cast<cl_context_properties>((platforms[0])()),
+        reinterpret_cast<cl_context_properties>((currentPlatform)()),
         0
     };
     // cl_context cxGPUContext =
@@ -56,12 +80,12 @@ Simulator::Simulator() {
     try {
         context = cl::Context(CL_DEVICE_TYPE_GPU, props);
     } catch (cl::Error er) {
-        printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
+        printf("ERROR: Could not create CL context. %s(%s) %d\n", er.what(), oclErrorString(er.err()), er.err());
     }
 
     // create the command queue we will use to execute OpenCL commands
     try {
-        queue = cl::CommandQueue(context, devices[deviceUsed], 0, &err);
+        queue = cl::CommandQueue(context, currentDevice, 0, &err);
     } catch (cl::Error er) {
         printf("ERROR: %s(%d)\n", er.what(), er.err());
     }
@@ -82,6 +106,9 @@ void Simulator::loadProgram(std::string kernel_source) {
         printf("ERROR: %s(%s)\n", er.what(), oclErrorString(er.err()));
     }
 
+    std::vector<cl::Device> devices;
+    devices.push_back(currentDevice);
+
     try {
         // err = program.build(devices,
         // "-cl-nv-verbose -cl-nv-maxrregcount=100");
@@ -89,6 +116,7 @@ void Simulator::loadProgram(std::string kernel_source) {
     }
     catch (cl::Error er) {
         printf("program.build: %s\n", oclErrorString(er.err()));
+        exit(0);
     }
     std::cout << "Build Status: "
               << program.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(devices[0])
@@ -215,13 +243,13 @@ const char* Simulator::oclErrorString(cl_int error) {
         "CL_IMAGE_FORMAT_NOT_SUPPORTED",
         "CL_BUILD_PROGRAM_FAILURE",
         "CL_MAP_FAILURE",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
+        "CL_MISALIGNED_SUB_BUFFER_OFFSET",
+        "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST",
+        "CL_COMPILE_PROGRAM_FAILURE",
+        "CL_LINKER_NOT_AVAILABLE",
+        "CL_LINK_PROGRAM_FAILURE",
+        "CL_DEVICE_PARTITION_FAILED",
+        "CL_KERNEL_ARG_INFO_NOT_AVAILABLE",
         "",
         "",
         "",
@@ -266,6 +294,11 @@ const char* Simulator::oclErrorString(cl_int error) {
         "CL_INVALID_BUFFER_SIZE",
         "CL_INVALID_MIP_LEVEL",
         "CL_INVALID_GLOBAL_WORK_SIZE",
+        "CL_INVALID_PROPERTY",
+        "CL_INVALID_IMAGE_DESCRIPTOR",
+        "CL_INVALID_COMPILER_OPTIONS",
+        "CL_INVALID_LINKER_OPTIONS",
+        "CL_INVALID_DEVICE_PARTITION_COUNT"
     };
     const int errorCount = sizeof(errorString) / sizeof(errorString[0]);
     const int index = -error;

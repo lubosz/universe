@@ -61,8 +61,7 @@ class Simulator {
     void initKernel();
     void runKernel();
 
-    unsigned int deviceUsed;
-    std::vector<cl::Device> devices;
+    cl::Device currentDevice;
 
     cl::Context context;
     cl::CommandQueue queue;
