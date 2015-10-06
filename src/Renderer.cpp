@@ -13,9 +13,9 @@
 #include <gli/gli.hpp>
 
 Renderer::Renderer(int width, int height) {
-    scrollPosition = -2.5;
-    theta = 1.8;
-    phi = 0;
+    scrollPosition = initialScrollPosition;
+    theta = initialTheta;
+    phi = initialPhi;
 
     if (gl3wInit()) {
         fprintf(stderr, "failed to initialize gl3w\n");
@@ -195,13 +195,13 @@ void Renderer::printShaderInfoLog(GLuint shader) {
 }
 
 void Renderer::rotate(float x, float y) {
-    theta += y * 0.002;
-    phi += x * 0.002;
+    theta += y * rotationSpeed;
+    phi += x * rotationSpeed;
     updateView();
 }
 
 void Renderer::translate(float z) {
-    scrollPosition += z * 0.05;
+    scrollPosition += z * scrollSpeed;
     updateView();
 }
 
@@ -228,7 +228,7 @@ void Renderer::updateProjection(int width, int height) {
     glViewport(0, 0, width, height);
     float aspect = static_cast<GLfloat>(width)
             / static_cast<GLfloat>(height);
-    projection = glm::perspective(45.0f, aspect, 0.01f, 10000.f);
+    projection = glm::perspective(fov, aspect, 0.01f, 10000.f);
     glUniformMatrix4fv(
                 glGetUniformLocation(shader_programm, "projectionMatrix"),
                 1, GL_FALSE, &projection[0][0]);

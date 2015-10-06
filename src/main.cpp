@@ -10,16 +10,12 @@
 #include "Renderer.h"
 #include "Simulator.h"
 #include "util.h"
+#include "options.h"
 #include <math.h>
 #include <random>
 
-#define NUM_PARTICLES 10000
-
 Simulator* simulator;
 Renderer* renderer;
-
-int window_width = 1920;
-int window_height = 1080;
 
 int mouse_old_x, mouse_old_y;
 int mouse_buttons = 0;
@@ -37,9 +33,9 @@ static void keyCallback(
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-        simulator->dt = 100.0;
+        simulator->dt = fastDt;
     if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
-        simulator->dt = 10.0;
+        simulator->dt = slowDt;
 }
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
@@ -139,7 +135,7 @@ void initSolarSystem() {
 
 void initParticles() {
     // initialize our particle system with positions, velocities and color
-    int num = NUM_PARTICLES;
+    const int num = NUM_PARTICLES;
 
     std::vector<Vec4> pos(num);
     std::vector<Vec4> vel(num);
@@ -153,6 +149,8 @@ void initParticles() {
     std::normal_distribution<> radiusDistribution(20, 10);
     std::normal_distribution<> heightDistribution(0, .5);
     std::uniform_real_distribution<> massDistribution(1, 1000);
+
+    // std::normal_distribution<> radiusDistribution(0.1, 30);
     // std::uniform_real_distribution<> velocityDist(-.1, .1);
     // std::normal_distribution<> massDist(10, 9.0);
 
@@ -203,6 +201,7 @@ void initParticles() {
 
         float acceleration = 0.0001 * (radius / 30.0);
 
+
         vel[i] = Vec4(normalizedTanent.x * acceleration,
                       normalizedTanent.y * acceleration,
                       normalizedTanent.z * acceleration,
@@ -214,7 +213,7 @@ void initParticles() {
 
     pos[1] = Vec4(0, 0, 0, 1);
     vel[1] = Vec4(0, 0, 0, 1);
-    mass[1] = 20000;
+    mass[1] = bigMass;
 
     // our load data function sends our initial values to the GPU
     simulator->loadData(pos, vel, color, mass);

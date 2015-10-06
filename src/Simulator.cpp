@@ -12,6 +12,7 @@
 #include "Simulator.h"
 #include "Renderer.h"
 #include "util.h"
+#include "options.h"
 #include <GL/glx.h>
 
 using std::string;
@@ -93,7 +94,7 @@ Simulator::Simulator() {
         printf("ERROR: %s(%d)\n", er.what(), er.err());
     }
     // gravities = (float *)malloc(particleCount*sizeof(float));
-    dt = 1000.0f;
+    dt = slowDt;
 }
 
 Simulator::~Simulator() {}
