@@ -58,10 +58,10 @@ Simulator::Simulator() {
             printf("%s: %s\n", type.c_str(), deviceName.c_str());
 
             //if (deviceName.compare("Intel(R) Core(TM) i7-4550U CPU @ 1.50GHz") == 0) {
-            if (deviceName.compare("Intel(R) HD Graphics Haswell Ultrabook GT3 Mobile") == 0) {
+            //if (deviceName.compare("Intel(R) HD Graphics Haswell Ultrabook GT3 Mobile") == 0) {
                 currentPlatform = platform;
                 currentDevice = device;
-            }
+            //}
 
         }
     }
