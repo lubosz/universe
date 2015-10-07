@@ -32,6 +32,8 @@ find_package(Qt5OpenGL)
 
 QT5_WRAP_UI(UI_HEADERS src/window.ui)
 
+message("the ui headers: ${UI_HEADERS}")
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 INCLUDE_DIRECTORIES( 
@@ -40,6 +42,7 @@ INCLUDE_DIRECTORIES(
     ${GLM_INCLUDE_PATH}
     ${Qt5OpenGL_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/gl3w/include/
+    src
 )
 
 function(add_cxxflag FLAG)
@@ -91,7 +94,7 @@ SET(SOURCES
   gl3w/src/gl3w.c
 )
 
-ADD_EXECUTABLE(universe ${SOURCES})
+ADD_EXECUTABLE(universe ${SOURCES} ${UI_HEADERS})
 
 TARGET_LINK_LIBRARIES (universe
    ${OPENGL_LIBRARIES}
