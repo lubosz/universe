@@ -13,6 +13,8 @@
 #include "options.h"
 #include <math.h>
 #include <random>
+#include <ctime>
+#include <chrono>
 
 Simulator* simulator;
 Renderer* renderer = NULL;
@@ -271,14 +273,47 @@ int main(int argc, char** argv) {
     // initSolarSystem();
     simulator->initKernel();
 
+    int printCounter = 0;
+
+    std::chrono::time_point<std::chrono::system_clock> start, physicsStep, graphicsStep;
+
     while (!glfwWindowShouldClose(window)) {
+
+        start = std::chrono::system_clock::now();
+
+
         simulator->runKernel();
+
+        physicsStep = std::chrono::system_clock::now();
+
         renderer->draw(simulator->positionVBO,
                        simulator->colorVBO,
                        simulator->massVBO,
                        simulator->particleCount);
         glfwSwapBuffers(window);
+
+        graphicsStep = std::chrono::system_clock::now();
+
         glfwPollEvents();
+
+        printCounter--;
+        if (printCounter < 0) {
+            std::cout << "simulation: "
+                      << std::chrono::duration_cast<std::chrono::microseconds>
+                         (physicsStep-start).count() / 1000.0
+                      << "ms\n";
+
+            std::cout << "graphics: "
+                      << std::chrono::duration_cast<std::chrono::microseconds>
+                         (graphicsStep-physicsStep).count() / 1000.0
+                      << "ms\n";
+
+            float totalMs = std::chrono::duration_cast<std::chrono::microseconds>
+                    (graphicsStep-start).count() / 1000.0;
+
+            std::cout << "total: " << totalMs << "ms (" << 1.0 / (totalMs / 1000.0) << " fps)\n";
+            printCounter = 10;
+        }
     }
 
     glfwDestroyWindow(window);
