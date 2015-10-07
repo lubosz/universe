@@ -35,6 +35,11 @@ Simulator::Simulator() {
     cl::Platform currentPlatform;
     err = cl::Platform::get(&platforms);
 
+    positionVBO = 0;
+    colorVBO = 0;
+    massVBO = 0;
+
+
     if (err != CL_SUCCESS) {
         printf("Error getting platforms: %s\n", oclErrorString(err));
         exit(0);
@@ -140,33 +145,46 @@ void Simulator::loadData(std::vector<Vec4> pos,
     // store the number of particles and the size in bytes of our arrays
     particleCount = pos.size();
     array_size = particleCount * sizeof(Vec4);
-    // create VBOs (defined in util.cpp)
-    positionVBO = Renderer::createVBO(
-                &pos[0], array_size, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
-    colorVBO = Renderer::createVBO(
-                &col[0], array_size, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
-    massVBO = Renderer::createVBO(
-                mass.data(), particleCount * sizeof(GLfloat),
-                GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
-    // make sure OpenGL is finished before we proceed
-    glFinish();
-    printf("gl interop!\n");
-    // create OpenCL buffer from GL VBO
-    cl_vbos.push_back(cl::BufferGL(
-                          context, CL_MEM_READ_WRITE, positionVBO, &err));
-    cl_vbos.push_back(cl::BufferGL(
-                          context, CL_MEM_READ_WRITE, colorVBO, &err));
 
-    cl_vbos.push_back(cl::BufferGL(
-                          context, CL_MEM_READ_WRITE, massVBO, &err));
+    // If not initialized create buffers
+    if (!positionVBO) {
+        positionVBO = Renderer::createVBO(
+                    &pos[0], array_size, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
+        colorVBO = Renderer::createVBO(
+                    &col[0], array_size, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
+        massVBO = Renderer::createVBO(
+                    mass.data(), particleCount * sizeof(GLfloat),
+                    GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
 
-    // create the OpenCL only arrays
-    velocityBuffer =
-            cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
-    // gravityBuffer =
-    // cl::Buffer(context, CL_MEM_WRITE_ONLY,
-    // particleCount * sizeof(float), NULL, &err);
-    printf("Pushing data to the GPU\n");
+        glFinish();
+        // create OpenCL buffer from GL VBO
+        cl_vbos.push_back(cl::BufferGL(
+                              context, CL_MEM_READ_WRITE, positionVBO, &err));
+        cl_vbos.push_back(cl::BufferGL(
+                              context, CL_MEM_READ_WRITE, colorVBO, &err));
+
+        cl_vbos.push_back(cl::BufferGL(
+                              context, CL_MEM_READ_WRITE, massVBO, &err));
+
+        // create the OpenCL only arrays
+        velocityBuffer =
+                cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
+
+        // gravityBuffer =
+        // cl::Buffer(context, CL_MEM_WRITE_ONLY,
+        // particleCount * sizeof(float), NULL, &err);
+
+    } else {
+        // just reupload data if buffers exist
+        glBindBuffer(GL_ARRAY_BUFFER, positionVBO);
+        glBufferData(GL_ARRAY_BUFFER, array_size, &pos[0], GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
+        glBufferData(GL_ARRAY_BUFFER, array_size, &col[0], GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, massVBO);
+        glBufferData(GL_ARRAY_BUFFER, particleCount * sizeof(GLfloat),
+                     mass.data(), GL_DYNAMIC_DRAW);
+
+    }
     // push our CPU arrays to the GPU
     // data is tightly packed in std::vector
     // starting with the adress of the first element

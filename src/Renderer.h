@@ -60,7 +60,7 @@ class Renderer {
 
     void bindState(int width, int height);
 
-    void initBuffers(GLuint positionVBO,
+    void createVertexArray(GLuint positionVBO,
                                GLuint colorVBO,
                                GLuint massVBO);
 

@@ -55,11 +55,12 @@ void Renderer::bindState(int width, int height) {
 
 Renderer::~Renderer() {}
 
-void Renderer::initBuffers(GLuint positionVBO,
-                           GLuint colorVBO,
-                           GLuint massVBO) {
+void Renderer::createVertexArray(GLuint positionVBO,
+                                 GLuint colorVBO,
+                                 GLuint massVBO) {
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
+
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, positionVBO);
   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
