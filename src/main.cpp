@@ -297,6 +297,8 @@ int main(int argc, char** argv) {
         renderer->draw(simulator->particleCount);
         glfwSwapBuffers(window);
 
+        glFinish();
+
         graphicsStep = std::chrono::system_clock::now();
 
         glfwPollEvents();
