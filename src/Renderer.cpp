@@ -55,11 +55,9 @@ void Renderer::bindState(int width, int height) {
 
 Renderer::~Renderer() {}
 
-void Renderer::draw(GLuint positionVBO, GLuint colorVBO,
-                    GLuint massVBO, int particleCount) {
-  // render the particles from VBOs
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+void Renderer::initBuffers(GLuint positionVBO,
+                           GLuint colorVBO,
+                           GLuint massVBO) {
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
   glEnableVertexAttribArray(0);
@@ -73,7 +71,11 @@ void Renderer::draw(GLuint positionVBO, GLuint colorVBO,
   glEnableVertexAttribArray(2);
   glBindBuffer(GL_ARRAY_BUFFER, massVBO);
   glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+}
 
+void Renderer::draw(int particleCount) {
+  // render the particles from VBOs
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDrawArrays(GL_POINTS, 0, particleCount);
 }
 

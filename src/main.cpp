@@ -50,6 +50,9 @@ static void keyCallback(
         initWindow();
         renderer->bindState(currentWindowWidth,
                             currentWindowHeight);
+        renderer->initBuffers(simulator->positionVBO,
+                       simulator->colorVBO,
+                       simulator->massVBO);
     }
 }
 
@@ -282,16 +285,16 @@ int main(int argc, char** argv) {
 
     std::chrono::time_point<std::chrono::system_clock> start, physicsStep, graphicsStep;
 
-    while (!glfwWindowShouldClose(window)) {
+    renderer->initBuffers(simulator->positionVBO,
+                   simulator->colorVBO,
+                   simulator->massVBO);
 
+    while (!glfwWindowShouldClose(window)) {
         start = std::chrono::system_clock::now();
         simulator->runKernel();
         physicsStep = std::chrono::system_clock::now();
 
-        renderer->draw(simulator->positionVBO,
-                       simulator->colorVBO,
-                       simulator->massVBO,
-                       simulator->particleCount);
+        renderer->draw(simulator->particleCount);
         glfwSwapBuffers(window);
 
         graphicsStep = std::chrono::system_clock::now();

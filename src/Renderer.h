@@ -53,13 +53,16 @@ class Renderer {
     void rotate(float x, float y);
     void translate(float z);
 
-    void draw(GLuint positionVBO, GLuint colorVBO,
-              GLuint massVBO, int particleCount);
+    void draw(int particleCount);
     static void checkGlError(const char* file, int line);
 
     GLuint initTexture(char const* Filename);
 
     void bindState(int width, int height);
+
+    void initBuffers(GLuint positionVBO,
+                               GLuint colorVBO,
+                               GLuint massVBO);
 
     static GLuint createVBO(
             const void* data,
