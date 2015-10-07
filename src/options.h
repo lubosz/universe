@@ -2,8 +2,8 @@
 #define OPTIONS_H
 
 // Window
-const int window_width = 640;
-const int window_height = 480;
+const int window_width = 1280;
+const int window_height = 720;
 
 const std::string title = "Universe Simulator";
 

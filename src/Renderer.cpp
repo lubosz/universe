@@ -28,7 +28,7 @@ Renderer::Renderer(int width, int height) {
 
     printContextInfo();
     initShaders();
-    tex = initTexture("media/cloud.dds");
+    tex = initTexture("media/cloud-big.dds");
     int pointSize[2];
     glGetIntegerv(GL_POINT_SIZE_RANGE, pointSize);
     printf("Point Size Min %d Max %d\n", pointSize[0], pointSize[1]);
