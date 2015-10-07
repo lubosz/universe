@@ -28,6 +28,7 @@ int mouse_old_x, mouse_old_y;
 int mouse_buttons = 0;
 
 void initWindow();
+void initParticles();
 
 static void windowFrameBufferCallback(
         GLFWwindow * window, int width, int height) {
@@ -45,11 +46,18 @@ static void keyCallback(
         simulator->dt = fastDt;
     if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
         simulator->dt = slowDt;
-    if (key == GLFW_KEY_F && action == GLFW_RELEASE) {
+    if (key == GLFW_KEY_F && action == GLFW_PRESS) {
         fullscreen = !fullscreen;
         initWindow();
         renderer->bindState(currentWindowWidth,
                             currentWindowHeight);
+        renderer->initBuffers(simulator->positionVBO,
+                       simulator->colorVBO,
+                       simulator->massVBO);
+    }
+    if(key == GLFW_KEY_R && action == GLFW_PRESS){
+        initParticles();
+        simulator->initKernel();
         renderer->initBuffers(simulator->positionVBO,
                        simulator->colorVBO,
                        simulator->massVBO);
