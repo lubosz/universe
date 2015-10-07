@@ -27,6 +27,7 @@ class Renderer {
  public:
     GLuint shader_programm;
     GLuint vao = 0;
+    GLuint tex;
 
     glm::mat4 view;
     glm::mat4 projection;
@@ -57,6 +58,8 @@ class Renderer {
     static void checkGlError(const char* file, int line);
 
     GLuint initTexture(char const* Filename);
+
+    void bindState(int width, int height);
 
     static GLuint createVBO(
             const void* data,

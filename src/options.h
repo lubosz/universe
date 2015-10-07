@@ -2,8 +2,10 @@
 #define OPTIONS_H
 
 // Window
-const int window_width = 1920;
-const int window_height = 1080;
+const int window_width = 640;
+const int window_height = 480;
+
+const std::string title = "Universe Simulator";
 
 // Camera Position
 const float initialScrollPosition = -2.5;

@@ -15,10 +15,17 @@
 #include <random>
 
 Simulator* simulator;
-Renderer* renderer;
+Renderer* renderer = NULL;
+GLFWwindow* window = NULL;
+bool fullscreen = true;
+
+int currentWindowWidth = window_width;
+int currentWindowHeight = window_height;
 
 int mouse_old_x, mouse_old_y;
 int mouse_buttons = 0;
+
+void initWindow();
 
 static void windowFrameBufferCallback(
         GLFWwindow * window, int width, int height) {
@@ -36,6 +43,12 @@ static void keyCallback(
         simulator->dt = fastDt;
     if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
         simulator->dt = slowDt;
+    if (key == GLFW_KEY_F && action == GLFW_RELEASE) {
+        fullscreen = !fullscreen;
+        initWindow();
+        renderer->bindState(currentWindowWidth,
+                            currentWindowHeight);
+    }
 }
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
@@ -71,8 +84,9 @@ static void cursorCallback(GLFWwindow* window, double x, double y) {
     mouse_old_y = y;
 }
 
-GLFWwindow* initGLFW() {
-    GLFWwindow* window;
+void initWindow() {
+    GLFWwindow * newWindow;
+
     glfwSetErrorCallback(errorCallback);
     if (!glfwInit())
         exit(EXIT_FAILURE);
@@ -81,22 +95,48 @@ GLFWwindow* initGLFW() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(
-                window_width, window_height,
-                "Universe Simulator", NULL, NULL);
-    if (!window) {
+    if (fullscreen) {
+        const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+        currentWindowWidth = mode->width;
+        currentWindowHeight = mode->height;
+
+        newWindow = glfwCreateWindow(currentWindowWidth,
+                                     currentWindowHeight,
+                                     title.c_str(),
+                                     glfwGetPrimaryMonitor(),
+                                     window);
+    } else {
+        currentWindowWidth = window_width;
+        currentWindowHeight = window_height;
+
+        newWindow = glfwCreateWindow(currentWindowWidth,
+                                     currentWindowHeight,
+                                     title.c_str(),
+                                     NULL,
+                                     window);
+    }
+
+    glfwDestroyWindow(window);
+
+    if (!newWindow) {
+        printf("ERROR: Could not create GLFW Window\n");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(newWindow);
     // glfwSwapInterval(1);
-    glfwSetKeyCallback(window, keyCallback);
-    glfwSetMouseButtonCallback(window, buttonCallback);
-    glfwSetScrollCallback(window, scrollCallback);
-    glfwSetCursorPosCallback(window, cursorCallback);
-    glfwSetFramebufferSizeCallback(window, windowFrameBufferCallback);
+    glfwSetKeyCallback(newWindow, keyCallback);
+    glfwSetMouseButtonCallback(newWindow, buttonCallback);
+    glfwSetScrollCallback(newWindow, scrollCallback);
+    glfwSetCursorPosCallback(newWindow, cursorCallback);
+    glfwSetFramebufferSizeCallback(newWindow, windowFrameBufferCallback);
 
-    return window;
+    window = newWindow;
 }
 
 void initSolarSystem() {
@@ -220,9 +260,9 @@ void initParticles() {
 }
 
 int main(int argc, char** argv) {
-    GLFWwindow* window = initGLFW();
-    renderer = new Renderer(window_width, window_height);
-
+    initWindow();
+    renderer = new Renderer(currentWindowWidth,
+                            currentWindowHeight);
     std::string kernel_source = readFile("gpu/vortex.cl");
     simulator = new Simulator();
     simulator->loadProgram(kernel_source);

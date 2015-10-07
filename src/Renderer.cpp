@@ -28,32 +28,29 @@ Renderer::Renderer(int width, int height) {
 
     printContextInfo();
     initShaders();
+    tex = initTexture("media/cloud.dds");
+    int pointSize[2];
+    glGetIntegerv(GL_POINT_SIZE_RANGE, pointSize);
+    printf("Point Size Min %d Max %d\n", pointSize[0], pointSize[1]);
+
+    bindState(width, height);
+
+    glError;
+}
+
+void Renderer::bindState(int width, int height) {
     glUseProgram(shader_programm);
-
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-
-    GLuint tex = initTexture("media/cloud.dds");
     glBindTexture(GL_TEXTURE_2D, tex);
-
     GLint texLoc = glGetUniformLocation(shader_programm, "cloud");
     glUniform1i(texLoc, tex-1);
-
     updateView();
     updateProjection(width, height);
-
-    float pointSize[2];
-
-    glGetFloatv(GL_POINT_SIZE_RANGE, pointSize);
-    printf("Point Size Min %f Max %f\n", pointSize[0], pointSize[1]);
-
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     glBindVertexArray(vao);
-
-    glError;
 }
 
 Renderer::~Renderer() {}
