@@ -249,8 +249,13 @@ void initParticles() {
                       normalizedTanent.z * acceleration,
                       1.0);
 
-        // just make them red and full alpha
-        color[i] = Vec4(radius/30.0, 0.0f, 0.0f, 1.0f);
+        glm::vec3 starColor = glm::mix(glm::vec3(.9,.1,.1),
+                                       glm::vec3(.1,.1,.9),
+                                       radius / 30.0);
+        color[i] = Vec4(starColor.x,
+                        starColor.y,
+                        starColor.z,
+                        1.0f);
     }
 
     pos[1] = Vec4(0, 0, 0, 1);
