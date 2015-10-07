@@ -1,6 +1,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 
-__constant float GRAVITY = 0.000000000000066742;
+__constant float GRAVITY = 0.000000000066742;
 
 
 __kernel void vortex(

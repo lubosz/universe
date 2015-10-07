@@ -19,6 +19,6 @@ void main () {
   vec4 position = viewMatrix * vec4 (vp);
   float distance = -position.z;
   gl_Position = projectionMatrix * position;
-  gl_PointSize = 2 * mp / distance;
-  massColor = mp / 2000;
+  gl_PointSize = 50 * mp / distance;
+  massColor = mp / 100;
 };

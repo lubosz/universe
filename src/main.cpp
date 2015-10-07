@@ -193,7 +193,7 @@ void initParticles() {
     // std::normal_distribution<> velocityDist(0, .00001);
     std::normal_distribution<> radiusDistribution(20, 10);
     std::normal_distribution<> heightDistribution(0, .5);
-    std::uniform_real_distribution<> massDistribution(1, 1000);
+    std::uniform_real_distribution<> massDistribution(1, 50);
 
     // std::normal_distribution<> radiusDistribution(0.1, 30);
     // std::uniform_real_distribution<> velocityDist(-.1, .1);
@@ -244,7 +244,7 @@ void initParticles() {
                     -sin(2 * M_PI * arrayPositionRatio), 0, 1);
         glm::vec4 normalizedTanent = glm::normalize(tangent);
 
-        float acceleration = 0.0001 * (radius / 30.0);
+        float acceleration = 0.001 * (radius / 30.0);
 
 
         vel[i] = Vec4(normalizedTanent.x * acceleration,

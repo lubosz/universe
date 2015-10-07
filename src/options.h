@@ -21,13 +21,13 @@ const float rotationSpeed = 0.002;
 
 // Simulation
 
-#define NUM_PARTICLES 15000
+#define NUM_PARTICLES 10000
 
 // Speed
-const float slowDt = 1000.0f;
+const float slowDt = 100.0f;
 const float fastDt = 10 * slowDt;
 
-const float bigMass = 20000;
+const float bigMass = 1000;
 
 #endif // OPTIONS_H
 
