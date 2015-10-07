@@ -41,8 +41,6 @@ class Simulator {
     std::vector<cl::Memory> cl_vbos;
     cl::Buffer velocityBuffer;
     cl::Buffer gravityBuffer;
-    cl::Buffer initialPositionBuffer;
-    cl::Buffer initivalVelocityBuffer;
 
     int positionVBO;
     int colorVBO;

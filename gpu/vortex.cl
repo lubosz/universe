@@ -8,8 +8,6 @@ __kernel void vortex(
   __global float4* color,
   __global float* masses,
   __global float4* vel,
-  __global float4* pos_gen,
-  __global float4* vel_gen,
   //__global float* gravity,
   float dt)
 {

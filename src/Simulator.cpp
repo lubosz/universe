@@ -163,10 +163,6 @@ void Simulator::loadData(std::vector<Vec4> pos,
     // create the OpenCL only arrays
     velocityBuffer =
             cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
-    initialPositionBuffer =
-            cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
-    initivalVelocityBuffer =
-            cl::Buffer(context, CL_MEM_WRITE_ONLY, array_size, NULL, &err);
     // gravityBuffer =
     // cl::Buffer(context, CL_MEM_WRITE_ONLY,
     // particleCount * sizeof(float), NULL, &err);
@@ -176,12 +172,6 @@ void Simulator::loadData(std::vector<Vec4> pos,
     // starting with the adress of the first element
     err = queue.enqueueWriteBuffer(
                 velocityBuffer, CL_TRUE, 0, array_size,
-                &vel[0], NULL, &event);
-    err = queue.enqueueWriteBuffer(
-                initialPositionBuffer, CL_TRUE, 0, array_size,
-                &pos[0], NULL, &event);
-    err = queue.enqueueWriteBuffer(
-                initivalVelocityBuffer, CL_TRUE, 0, array_size,
                 &vel[0], NULL, &event);
     queue.finish();
 }
@@ -199,8 +189,6 @@ void Simulator::initKernel() {
         err = kernel.setArg(1, cl_vbos[1]);
         err = kernel.setArg(2, cl_vbos[2]);
         err = kernel.setArg(3, velocityBuffer);
-        err = kernel.setArg(4, initialPositionBuffer);
-        err = kernel.setArg(5, initivalVelocityBuffer);
         //  err = kernel.setArg(6, gravityBuffer);
     }
     catch (cl::Error er) {
@@ -221,7 +209,7 @@ void Simulator::runKernel() {
     err = queue.enqueueAcquireGLObjects(&cl_vbos, NULL, &event);
 
     // pass in the timestep
-    kernel.setArg(6, dt);
+    kernel.setArg(4, dt);
     // execute the kernel
     err = queue.enqueueNDRangeKernel(
                 kernel,
