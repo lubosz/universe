@@ -154,30 +154,37 @@ void initSolarSystem() {
     std::vector<Vec4> color;
     std::vector<GLfloat> mass;
 
-    // sun
+    float gravity = 0.000000000066742;
+    float centralMass = 1000;
+    float radius = 10;
+    float sateliteMass = 10;
 
     pos.push_back(Vec4(0, 0, 0, 1));
     vel.push_back(Vec4(0, 0, 0, 1));
-    color.push_back(Vec4(0, 0, 0, 1));
-    mass.push_back(333000.0);
+    color.push_back(Vec4(1, 0, 0, 1));
+    mass.push_back(centralMass);
 
-    // 2020 / 333000.0;
+    glm::vec4 tangent =
+            glm::vec4(
+                cos(2 * M_PI * 0.1),
+                -sin(2 * M_PI * 0.1), 0, 1);
+    glm::vec4 normalizedTanent = glm::normalize(tangent);
+
+    //float acceleration = 0.00001;
+    //float rs = 2 * gravity / pow(c,2);
+    //float acceleration = sqrt(gravity*centralMass/(radius * rs));
+
+    float acceleration = sqrt(gravity * centralMass / radius);
 
     // earth
     // distance ×10^8 km
-    pos.push_back(Vec4(1.470, 0, 0, 1));
-    vel.push_back(Vec4(0, .005, 0, 1));
-    color.push_back(Vec4(0, 0, 0, 1));
-    mass.push_back(1.0);
-
-
-    // jupiter
-    // Perihelion
-    pos.push_back(Vec4(7.405736, 0, 0 , 1));
-    vel.push_back(Vec4(0, -.005, 0, 1));
-    color.push_back(Vec4(0, 0, 0, 1));
-    mass.push_back(317.8);
-
+    pos.push_back(Vec4(0, radius, 0, 1));
+    vel.push_back(Vec4(normalizedTanent.x * acceleration,
+                       normalizedTanent.y * acceleration,
+                       normalizedTanent.z * acceleration,
+                       1.0));
+    color.push_back(Vec4(0, 1, 0, 1));
+    mass.push_back(sateliteMass);
 
     simulator->loadData(pos, vel, color, mass);
 }
@@ -281,8 +288,8 @@ int main(int argc, char** argv) {
     simulator = new Simulator();
     simulator->loadProgram(kernel_source);
 
-    initParticles();
-    // initSolarSystem();
+    //initParticles();
+    initSolarSystem();
     simulator->initKernel();
 
     int printCounter = 0;
