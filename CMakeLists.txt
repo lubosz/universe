@@ -18,15 +18,27 @@ endif()
 
 set(glfw3_DIR /usr/lib/cmake/glfw)
 
+set(CMAKE_AUTOMOC ON)
+
 FIND_PACKAGE(OpenCL)
 FIND_PACKAGE(OpenGL)
 FIND_PACKAGE(glm)
 FIND_PACKAGE(glfw3)
 
+find_package(Qt5Core)
+find_package(Qt5Widgets)
+find_package(Qt5Gui)
+find_package(Qt5OpenGL)
+
+QT5_WRAP_UI(UI_HEADERS src/window.ui)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 INCLUDE_DIRECTORIES( 
     ${OPENGL_INCLUDE_DIR}
     ${GLFW3_INCLUDE_PATH}
     ${GLM_INCLUDE_PATH}
+    ${Qt5OpenGL_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/gl3w/include/
 )
 
@@ -64,6 +76,8 @@ add_cxxflag("-Wlogical-op")
 add_cxxflag("-Woverflow")
 add_cxxflag("-Wredundant-decls")
 
+
+
 SET(SOURCES
   src/main.cpp
   src/Simulator.h
@@ -72,6 +86,8 @@ SET(SOURCES
   src/Renderer.cpp
   src/util.h
   src/util.cpp
+  src/myglwidget.cpp
+  src/window.cpp
   gl3w/src/gl3w.c
 )
 
@@ -82,6 +98,8 @@ TARGET_LINK_LIBRARIES (universe
    ${GLEW_LIBRARY}
    ${OpenCL_LIBRARY}
    ${GLFW3_LIBRARY}
+   Qt5::Widgets
+   Qt5::OpenGL
    dl
 )
 

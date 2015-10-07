@@ -11,8 +11,12 @@
 #include "Simulator.h"
 #include "util.h"
 #include "options.h"
+#include "window.h"
 #include <math.h>
 #include <random>
+
+#include <QApplication>
+#include <QDesktopWidget>
 
 Simulator* simulator;
 Renderer* renderer = NULL;
@@ -260,6 +264,21 @@ void initParticles() {
 }
 
 int main(int argc, char** argv) {
+
+    QApplication app(argc, argv);
+    Window qtwindow;
+    qtwindow.resize(qtwindow.sizeHint());
+    int desktopArea = QApplication::desktop()->width() *
+                     QApplication::desktop()->height();
+    int widgetArea = qtwindow.width() * qtwindow.height();
+
+    //qtwindow.setWindowTitle(title);
+
+    qtwindow.show();
+
+    return app.exec();
+
+    /*
     initWindow();
     renderer = new Renderer(currentWindowWidth,
                             currentWindowHeight);
@@ -284,4 +303,5 @@ int main(int argc, char** argv) {
     glfwDestroyWindow(window);
     glfwTerminate();
     exit(EXIT_SUCCESS);
+    */
 }
