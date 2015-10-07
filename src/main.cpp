@@ -131,7 +131,7 @@ void initWindow() {
         exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(newWindow);
-    // glfwSwapInterval(1);
+    glfwSwapInterval(0);
     glfwSetKeyCallback(newWindow, keyCallback);
     glfwSetMouseButtonCallback(newWindow, buttonCallback);
     glfwSetScrollCallback(newWindow, scrollCallback);
@@ -280,10 +280,7 @@ int main(int argc, char** argv) {
     while (!glfwWindowShouldClose(window)) {
 
         start = std::chrono::system_clock::now();
-
-
         simulator->runKernel();
-
         physicsStep = std::chrono::system_clock::now();
 
         renderer->draw(simulator->positionVBO,
