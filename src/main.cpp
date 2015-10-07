@@ -149,33 +149,33 @@ void initWindow() {
 }
 
 void initSolarSystem() {
-    std::vector<Vec4> pos;
-    std::vector<Vec4> vel;
-    std::vector<Vec4> color;
+    std::vector<glm::vec4> pos;
+    std::vector<glm::vec4> vel;
+    std::vector<glm::vec4> color;
     std::vector<GLfloat> mass;
 
     // sun
 
-    pos.push_back(Vec4(0, 0, 0, 1));
-    vel.push_back(Vec4(0, 0, 0, 1));
-    color.push_back(Vec4(0, 0, 0, 1));
+    pos.push_back(glm::vec4(0, 0, 0, 1));
+    vel.push_back(glm::vec4(0, 0, 0, 1));
+    color.push_back(glm::vec4(0, 0, 0, 1));
     mass.push_back(333000.0);
 
     // 2020 / 333000.0;
 
     // earth
     // distance ×10^8 km
-    pos.push_back(Vec4(1.470, 0, 0, 1));
-    vel.push_back(Vec4(0, .005, 0, 1));
-    color.push_back(Vec4(0, 0, 0, 1));
+    pos.push_back(glm::vec4(1.470, 0, 0, 1));
+    vel.push_back(glm::vec4(0, .005, 0, 1));
+    color.push_back(glm::vec4(0, 0, 0, 1));
     mass.push_back(1.0);
 
 
     // jupiter
     // Perihelion
-    pos.push_back(Vec4(7.405736, 0, 0 , 1));
-    vel.push_back(Vec4(0, -.005, 0, 1));
-    color.push_back(Vec4(0, 0, 0, 1));
+    pos.push_back(glm::vec4(7.405736, 0, 0 , 1));
+    vel.push_back(glm::vec4(0, -.005, 0, 1));
+    color.push_back(glm::vec4(0, 0, 0, 1));
     mass.push_back(317.8);
 
 
@@ -186,9 +186,9 @@ void initParticles() {
     // initialize our particle system with positions, velocities and color
     const int num = NUM_PARTICLES;
 
-    std::vector<Vec4> pos(num);
-    std::vector<Vec4> vel(num);
-    std::vector<Vec4> color(num);
+    std::vector<glm::vec4> pos(num);
+    std::vector<glm::vec4> vel(num);
+    std::vector<glm::vec4> color(num);
     std::vector<GLfloat> mass(num);
 
     std::random_device rd;
@@ -203,70 +203,36 @@ void initParticles() {
     // std::uniform_real_distribution<> velocityDist(-.1, .1);
     // std::normal_distribution<> massDist(10, 9.0);
 
-    // fill our vectors with initial data
     for (int i = 0; i < num; i++) {
-        // distribute the particles in a random circle around z axis
+        // distribute the particles in a circle
         float radius = radiusDistribution(e2);
-
-        /*
-        // float rad = 1.0;
-        float x = rad * sin(2 * M_PI * i/num);
-        float z = 0.0f;  // -.1 + .2f * i/num;
-        float y = rad * cos(2 * M_PI * i/num);
-        */
-
         float arrayPositionRatio =
                 static_cast<float>(i) / static_cast<float>(num);
-
-        pos[i] = Vec4(radius * sin(2 * M_PI * arrayPositionRatio),
+        pos[i] = glm::vec4(radius * sin(2 * M_PI * arrayPositionRatio),
                       radius * cos(2 * M_PI * arrayPositionRatio),
                       heightDistribution(e2), 1.0f);
 
-        mass[i] = fabs(massDistribution(e2));
+        // distribute masses
+        mass[i] = massDistribution(e2);
 
-        // give some initial velocity
-        // float xr = rand_float(-.1, .1);
-        // float yr = rand_float(1.f, 3.f);
-        // the life is the lifetime of the particle: 1 = alive 0 = dead
-        // as you will see in part2.cl we reset the particle when it dies
-        // float life_r = randomFloat(0.f, 1.f);
-        // vel[i] = Vec4(0.0, 0.0, 3.0f, life_r);
 
-        /*
-        vel[i] =
-                Vec4(
-                    velocityDist(e2),
-                    velocityDist(e2),
-                    velocityDist(e2),
-                    1);
-        */
-
-        vel[i] = Vec4(0, 0, 0, 1);
-        glm::vec4 tangent =
-                glm::vec4(
+        // give initial velocity in circle tangent direction
+        glm::vec4 tangent = glm::vec4(
                     cos(2 * M_PI * arrayPositionRatio),
                     -sin(2 * M_PI * arrayPositionRatio), 0, 1);
         glm::vec4 normalizedTanent = glm::normalize(tangent);
 
         float acceleration = 0.001 * (radius / 30.0);
+        vel[i] = normalizedTanent * acceleration;
 
-
-        vel[i] = Vec4(normalizedTanent.x * acceleration,
-                      normalizedTanent.y * acceleration,
-                      normalizedTanent.z * acceleration,
-                      1.0);
-
-        glm::vec3 starColor = glm::mix(glm::vec3(.9,.1,.1),
-                                       glm::vec3(.1,.1,.9),
-                                       radius / 30.0);
-        color[i] = Vec4(starColor.x,
-                        starColor.y,
-                        starColor.z,
-                        1.0f);
+        // set color. bigger radius blue, closer to center red
+        color[i] = glm::mix(glm::vec4(.9,.1,.1, 1),
+                            glm::vec4(.1,.1,.9, 1),
+                            radius / 30.0);
     }
 
-    pos[1] = Vec4(0, 0, 0, 1);
-    vel[1] = Vec4(0, 0, 0, 1);
+    pos[1] = glm::vec4(0, 0, 0, 1);
+    vel[1] = glm::vec4(0, 0, 0, 1);
     mass[1] = bigMass;
 
     // our load data function sends our initial values to the GPU
