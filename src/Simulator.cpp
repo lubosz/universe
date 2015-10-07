@@ -138,13 +138,13 @@ void Simulator::loadProgram(std::string kernel_source) {
               << std::endl;
 }
 
-void Simulator::loadData(std::vector<Vec4> pos,
-        std::vector<Vec4> vel,
-        std::vector<Vec4> col,
+void Simulator::loadData(std::vector<glm::vec4> pos,
+        std::vector<glm::vec4> vel,
+        std::vector<glm::vec4> col,
         std::vector<float> mass) {
     // store the number of particles and the size in bytes of our arrays
     particleCount = pos.size();
-    array_size = particleCount * sizeof(Vec4);
+    array_size = particleCount * sizeof(glm::vec4);
 
     // If not initialized create buffers
     if (!positionVBO) {
