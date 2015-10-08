@@ -156,8 +156,8 @@ void initSolarSystem() {
 
     float gravity = 0.000000000066742;
     float centralMass = 1000;
-    float radius = 10;
-    float sateliteMass = 10;
+    float radius = 20;
+    float sateliteMass = 100;
 
     pos.push_back(glm::vec4(0, 0, 0, 1));
     vel.push_back(glm::vec4(0, 0, 0, 1));
@@ -180,10 +180,14 @@ void initSolarSystem() {
     // earth
     // distance ×10^8 km
     pos.push_back(glm::vec4(0, radius, 0, 1));
+
     vel.push_back(glm::vec4(normalizedTanent.x * acceleration,
                        normalizedTanent.y * acceleration,
                        normalizedTanent.z * acceleration,
                        1.0));
+
+    //vel.push_back(glm::vec4(0,0,0,1.0));
+
     color.push_back(glm::vec4(0, 1, 0, 1));
     mass.push_back(sateliteMass);
 
@@ -255,8 +259,8 @@ int main(int argc, char** argv) {
     simulator = new Simulator();
     simulator->loadProgram(kernel_source);
 
-    //initParticles();
-    initSolarSystem();
+    initParticles();
+    //initSolarSystem();
     simulator->initKernel();
 
     int printCounter = 0;
