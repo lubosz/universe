@@ -207,7 +207,9 @@ void initParticles() {
     std::mt19937 e2(rd());
 
     // std::normal_distribution<> velocityDist(0, .00001);
-    std::normal_distribution<> radiusDistribution(20, 10);
+    float meanRadius = 20;
+    std::normal_distribution<> radiusDistribution(meanRadius, meanRadius/2.0);
+    std::normal_distribution<> positionDistribution(0.5,0.5);
     std::normal_distribution<> heightDistribution(0, .5);
     std::uniform_real_distribution<> massDistribution(1, 50);
 
@@ -218,8 +220,8 @@ void initParticles() {
     for (int i = 0; i < num; i++) {
         // distribute the particles in a circle
         float radius = radiusDistribution(e2);
-        float arrayPositionRatio =
-                static_cast<float>(i) / static_cast<float>(num);
+        float arrayPositionRatio = positionDistribution(e2);
+
         pos[i] = glm::vec4(radius * sin(2 * M_PI * arrayPositionRatio),
                       radius * cos(2 * M_PI * arrayPositionRatio),
                       heightDistribution(e2), 1.0f);
@@ -234,7 +236,7 @@ void initParticles() {
                     -sin(2 * M_PI * arrayPositionRatio), 0, 1);
         glm::vec4 normalizedTanent = glm::normalize(tangent);
 
-        float acceleration = 0.001 * (radius / 30.0);
+        float acceleration = 0.001 * (radius/meanRadius*0.75);
         vel[i] = normalizedTanent * acceleration;
 
         // set color. bigger radius blue, closer to center red

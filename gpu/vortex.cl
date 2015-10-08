@@ -26,19 +26,29 @@ __kernel void vortex(
     if (mass == 0)
       return;
 
-    //if (p.x != 0 && p.z != 0)
       for (int j = 0; j < particle_count; j++) {
-        if (masses[j] == 0)
+        if (masses[j] == 0  || j == i)
           continue;
         float4 distance = pos[j] - p;
-        if (length(distance) > 0.35) {
+
+        if (length(distance) <= 0)
+            continue;
+
+        if (length(distance) > 0.1) {
           float acceleration = GRAVITY * masses[j] / (pow(length(distance),2));
           accelerationDirection += normalize(distance) * acceleration;
-        } else if (length(distance) < 0.01 && masses[i] < masses[j]) {
-              masses[j] += masses[i];
-              vel[j] += vel[i] * masses[i] / masses[j];
-              masses[i] = 0;
         }
+
+        if (
+            //length(distance) < (masses[j]+masses[i]) * 0.00015 &&
+            length(distance) < 0.01 &&
+            masses[i] < masses[j]) {
+                  masses[j] += masses[i];
+                  vel[j] += vel[i] * masses[i] / masses[j];
+                  masses[i] = 0;
+                  return;
+        }
+
 
 
       }
@@ -46,7 +56,7 @@ __kernel void vortex(
     //gravity[i] = length(accelerationDirection);
     //gravity[i] = force;
 
-    v += accelerationDirection * dt;
+    v += accelerationDirection*dt;
     v.w = 1;
 
     //we use a first order euler method to integrate the velocity and position (i'll expand on this in another tutorial)

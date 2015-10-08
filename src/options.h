@@ -27,7 +27,7 @@ const float rotationSpeed = 0.002;
 const float slowDt = 100.0f;
 const float fastDt = 10 * slowDt;
 
-const float bigMass = 1000;
+const float bigMass = 1;
 
 #endif // OPTIONS_H
 
