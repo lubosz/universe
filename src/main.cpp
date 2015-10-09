@@ -159,35 +159,29 @@ void initSolarSystem() {
     float radius = 20;
     float sateliteMass = 100;
 
+    //create central mass particle
     pos.push_back(glm::vec4(0, 0, 0, 1));
     vel.push_back(glm::vec4(0, 0, 0, 1));
     color.push_back(glm::vec4(1, 0, 0, 1));
     mass.push_back(centralMass);
 
+    //calculate inertial direction/tangent on circle
     glm::vec4 tangent =
             glm::vec4(
                 cos(2 * M_PI * 0.1),
                 -sin(2 * M_PI * 0.1), 0, 1);
+    //normalize tangent
     glm::vec4 normalizedTanent = glm::normalize(tangent);
 
-
-    //float acceleration = 0.00001;
-    //float rs = 2 * gravity / pow(c,2);
-    //float acceleration = sqrt(gravity*centralMass/(radius * rs));
-
+    //calculate inertial acceleration of satelite to match a stable orbit
     float acceleration = sqrt(gravity * centralMass / radius);
 
-    // earth
-    // distance ×10^8 km
+    //create satelite particle
     pos.push_back(glm::vec4(0, radius, 0, 1));
-
     vel.push_back(glm::vec4(normalizedTanent.x * acceleration,
                        normalizedTanent.y * acceleration,
                        normalizedTanent.z * acceleration,
                        1.0));
-
-    //vel.push_back(glm::vec4(0,0,0,1.0));
-
     color.push_back(glm::vec4(0, 1, 0, 1));
     mass.push_back(sateliteMass);
 
@@ -261,8 +255,8 @@ int main(int argc, char** argv) {
     simulator = new Simulator();
     simulator->loadProgram(kernel_source);
 
-    initParticles();
-    //initSolarSystem();
+    //initParticles();
+    initSolarSystem();
     simulator->initKernel();
 
     int printCounter = 0;

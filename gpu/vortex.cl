@@ -18,39 +18,51 @@ __kernel void vortex(
 
     float4 accelerationDirection = (float4)(0, 0, 0, 0);
 
+    // Ignore deleted particles
     if (mass == 0)
       return;
 
-      for (int j = 0; j < particle_count; j++) {
+    // Calculate gravitational force for all particles
+    for (int j = 0; j < particle_count; j++) {
+        // Ignore deleted masses, ignore gravitation to self
         if (masses[j] == 0  || j == i)
           continue;
+
         float4 distance = pos[j] - p;
 
+        // Ignore 0 distances
         if (length(distance) <= 0)
             continue;
 
+        // Calculate force with minimum distance threshold
         if (length(distance) > 0.1) {
           float acceleration = GRAVITY * masses[j] / (pow(length(distance),2));
           accelerationDirection += normalize(distance) * acceleration;
         }
 
+        // Merge small particle into big if distance is short enough
         if (
             //length(distance) < (masses[j]+masses[i]) * 0.00015 &&
             length(distance) < 0.01 &&
             masses[i] < masses[j]) {
                   masses[j] += masses[i];
+                  // Use small particle velocity on big
                   vel[j] += vel[i] * masses[i] / masses[j];
+                  // Delete small particle
                   masses[i] = 0;
                   return;
         }
-      }
+    }
 
+    // Calculate new velocity with acceleration
     v += accelerationDirection*dt;
     v.w = 1;
 
+    // Calculate new position with velocity
     p += v*dt;
     p.w = 1;
 
+    // Update positions and velocities
     pos[i] = p;
     vel[i] = v;
 }
