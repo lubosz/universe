@@ -255,8 +255,8 @@ int main(int argc, char** argv) {
     simulator = new Simulator();
     simulator->loadProgram(kernel_source);
 
-    //initParticles();
-    initSolarSystem();
+    initParticles();
+    //initSolarSystem();
     simulator->initKernel();
 
     int printCounter = 0;
