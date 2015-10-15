@@ -183,7 +183,6 @@ void Simulator::loadData(std::vector<glm::vec4> pos,
         glBindBuffer(GL_ARRAY_BUFFER, massVBO);
         glBufferData(GL_ARRAY_BUFFER, particleCount * sizeof(GLfloat),
                      mass.data(), GL_DYNAMIC_DRAW);
-
     }
     // push our CPU arrays to the GPU
     // data is tightly packed in std::vector

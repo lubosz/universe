@@ -55,7 +55,7 @@ static void keyCallback(
                        simulator->colorVBO,
                        simulator->massVBO);
     }
-    if(key == GLFW_KEY_R && action == GLFW_PRESS){
+    if (key == GLFW_KEY_R && action == GLFW_PRESS) {
         initParticles();
     }
 }
@@ -159,24 +159,24 @@ void initSolarSystem() {
     float radius = 20;
     float sateliteMass = 100;
 
-    //create central mass particle
+    // create central mass particle
     pos.push_back(glm::vec4(0, 0, 0, 1));
     vel.push_back(glm::vec4(0, 0, 0, 1));
     color.push_back(glm::vec4(1, 0, 0, 1));
     mass.push_back(centralMass);
 
-    //calculate inertial direction/tangent on circle
+    // calculate inertial direction/tangent on circle
     glm::vec4 tangent =
             glm::vec4(
                 cos(2 * M_PI * 0.1),
                 -sin(2 * M_PI * 0.1), 0, 1);
-    //normalize tangent
+    // normalize tangent
     glm::vec4 normalizedTanent = glm::normalize(tangent);
 
-    //calculate inertial acceleration of satelite to match a stable orbit
+    // calculate inertial acceleration of satelite to match a stable orbit
     float acceleration = sqrt(gravity * centralMass / radius);
 
-    //create satelite particle
+    // create satellite particle
     pos.push_back(glm::vec4(0, radius, 0, 1));
     vel.push_back(glm::vec4(normalizedTanent.x * acceleration,
                        normalizedTanent.y * acceleration,
@@ -200,16 +200,11 @@ void initParticles() {
     std::random_device rd;
     std::mt19937 e2(rd());
 
-    // std::normal_distribution<> velocityDist(0, .00001);
     float meanRadius = 20;
     std::normal_distribution<> radiusDistribution(meanRadius, meanRadius/2.0);
-    std::normal_distribution<> positionDistribution(0.5,0.5);
+    std::normal_distribution<> positionDistribution(0.5, 0.5);
     std::normal_distribution<> heightDistribution(0, .5);
     std::uniform_real_distribution<> massDistribution(1, 50);
-
-    // std::normal_distribution<> radiusDistribution(0.1, 30);
-    // std::uniform_real_distribution<> velocityDist(-.1, .1);
-    // std::normal_distribution<> massDist(10, 9.0);
 
     for (int i = 0; i < num; i++) {
         // distribute the particles in a circle
@@ -234,8 +229,8 @@ void initParticles() {
         vel[i] = normalizedTanent * acceleration;
 
         // set color. bigger radius blue, closer to center red
-        color[i] = glm::mix(glm::vec4(.9,.1,.1, 1),
-                            glm::vec4(.1,.1,.9, 1),
+        color[i] = glm::mix(glm::vec4(.9, .1, .1, 1),
+                            glm::vec4(.1, .1, .9, 1),
                             radius / 30.0);
     }
 
@@ -256,12 +251,13 @@ int main(int argc, char** argv) {
     simulator->loadProgram(kernel_source);
 
     initParticles();
-    //initSolarSystem();
+    // initSolarSystem();
     simulator->initKernel();
 
     int printCounter = 0;
 
-    std::chrono::time_point<std::chrono::system_clock> start, physicsStep, graphicsStep;
+    std::chrono::time_point<std::chrono::system_clock>
+            start, physicsStep, graphicsStep;
 
     renderer->createVertexArray(simulator->positionVBO,
                    simulator->colorVBO,
@@ -293,10 +289,12 @@ int main(int argc, char** argv) {
                          (graphicsStep-physicsStep).count() / 1000.0
                       << "ms\n";
 
-            float totalMs = std::chrono::duration_cast<std::chrono::microseconds>
+            float totalMs =
+                    std::chrono::duration_cast<std::chrono::microseconds>
                     (graphicsStep-start).count() / 1000.0;
 
-            std::cout << "total: " << totalMs << "ms (" << 1.0 / (totalMs / 1000.0) << " fps)\n";
+            std::cout << "total: " << totalMs << "ms ("
+                      << 1.0 / (totalMs / 1000.0) << " fps)\n";
             printCounter = 10;
         }
     }

@@ -92,7 +92,7 @@ else()
     set(PYTHON2 "python")
 endif()
 
-set(IGNORE "-readability/streams,-build/include")
+set(IGNORE "-readability/streams,-build/include,-build/c++11")
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/cpplint.py)
       message("cpplint.py found")
