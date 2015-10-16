@@ -1,0 +1,38 @@
+{
+   GLFW XkbGetMap Leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   fun:XkbGetMap
+   obj:/usr/lib/libglfw.so.3.1
+   fun:glfwInit
+   fun:_Z10initWindowv
+   fun:main
+}
+{
+   clGetPlatformIDs
+   Memcheck:Leak
+   ...
+   obj:/opt/cuda/lib64/libOpenCL.so
+   ...
+   fun:clGetPlatformIDs
+   ...
+}
+{
+   cuda/lib64/libOpenCL
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   obj:/usr/lib/libnvidia-opencl.so.355.11
+   ...
+   obj:/opt/cuda/lib64/libOpenCL.so
+}
+{
+   libnvidia-opencl
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   obj:/usr/lib/libnvidia-opencl.so.355.11
+   ...
+   obj:/usr/lib/libnvidia-opencl.so.355.11
+}
