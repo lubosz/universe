@@ -19,20 +19,10 @@
    ...
 }
 {
-   cuda/lib64/libOpenCL
+   readFile
    Memcheck:Leak
-   match-leak-kinds: possible
-   fun:calloc
-   obj:/usr/lib/libnvidia-opencl.so.355.11
+   match-leak-kinds: reachable
    ...
-   obj:/opt/cuda/lib64/libOpenCL.so
-}
-{
-   libnvidia-opencl
-   Memcheck:Leak
-   match-leak-kinds: possible
-   fun:calloc
-   obj:/usr/lib/libnvidia-opencl.so.355.11
-   ...
-   obj:/usr/lib/libnvidia-opencl.so.355.11
+   fun:_Z8readFilePKc
+   fun:main
 }

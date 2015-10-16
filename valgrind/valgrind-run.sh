@@ -8,7 +8,9 @@ SUPP_DIR=$SCRIPT_DIR/suppressions
 
 valgrind \
    --leak-check=full \
+   --show-leak-kinds=all \
    --error-limit=no \
    --suppressions=$SUPP_DIR/issues.supp \
+   --suppressions=$SUPP_DIR/libs.supp \
    -v \
    $1

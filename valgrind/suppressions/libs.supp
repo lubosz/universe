@@ -1,0 +1,56 @@
+{
+   obj:/opt/cuda/lib64/libOpenCL
+   Memcheck:Leak
+   ...
+   obj:/opt/cuda/lib64/libOpenCL.so
+   ...
+}
+{
+   ld-2
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/ld-2.22.so
+   ...
+}
+{
+   libdl-2
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/libdl-2.22.so
+   ...
+}
+{
+   libglfw
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/libglfw.so.3.1
+   ...
+}
+{
+   libnvidia-compiler
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/libnvidia-compiler.so.355.11
+   ...
+}
+{
+   libnvidia-opencl
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/libnvidia-opencl.so.355.11
+   ...
+}
+{
+   libX11
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/libX11.so.6.3.0
+   ...
+}
+{
+   nvidia/libGL
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/nvidia/libGL.so.355.11
+   ...
+}
