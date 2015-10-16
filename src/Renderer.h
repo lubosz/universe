@@ -48,6 +48,8 @@ class Renderer {
     GLuint vao = 0;
     GLuint tex;
 
+    GLuint textureId = 0;
+
     glm::mat4 view;
     glm::mat4 projection;
 

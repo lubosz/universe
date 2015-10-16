@@ -52,7 +52,7 @@ static std::string deviceTypeToString(int type) {
 Simulator::Simulator() {
     std::vector<cl::Platform> platforms;
     cl::Platform currentPlatform;
-    err = cl::Platform::get(&platforms);
+    cl_int err = cl::Platform::get(&platforms);
 
     positionVBO = 0;
     colorVBO = 0;
@@ -125,7 +125,6 @@ Simulator::~Simulator() {}
 
 
 void Simulator::loadProgram(std::string kernel_source) {
-    // Program Setup
     int pl = kernel_source.size();
     try {
         cl::Program::Sources source(
@@ -142,7 +141,7 @@ void Simulator::loadProgram(std::string kernel_source) {
     try {
         // err = program.build(devices,
         // "-cl-nv-verbose -cl-nv-maxrregcount=100");
-        err = program.build(devices);
+        program.build(devices);
     }
     catch (cl::Error er) {
         printf("program.build: %s\n", oclErrorString(er.err()));
@@ -162,6 +161,8 @@ void Simulator::loadData(std::vector<glm::vec4> pos,
         std::vector<glm::vec4> col,
         std::vector<float> mass) {
     // store the number of particles and the size in bytes of our arrays
+    cl_int err;
+
     particleCount = pos.size();
     array_size = particleCount * sizeof(glm::vec4);
 
@@ -213,6 +214,7 @@ void Simulator::loadData(std::vector<glm::vec4> pos,
 }
 
 void Simulator::initKernel() {
+    cl_int err;
     try {
         kernel = cl::Kernel(program, "vortex", &err);
     }
@@ -242,7 +244,11 @@ void Simulator::runKernel() {
     glFinish();
     // map OpenGL buffer object for writing from OpenCL
     // this passes in the vector of VBO buffer objects (position and color)
-    err = queue.enqueueAcquireGLObjects(&cl_vbos, NULL, &event);
+    cl_int err = queue.enqueueAcquireGLObjects(&cl_vbos, NULL, &event);
+
+    if (err != CL_SUCCESS) {
+        printf("Error enqueueAcquireGLObjects: %s\n", oclErrorString(err));
+    }
 
     // pass in the timestep
     kernel.setArg(4, dt);

@@ -72,7 +72,11 @@ void Renderer::bindState(int width, int height) {
     glBindVertexArray(vao);
 }
 
-Renderer::~Renderer() {}
+Renderer::~Renderer() {
+    GLuint textures[1];
+    textures[0] = textureId;
+    glDeleteTextures(1, textures);
+}
 
 void Renderer::createVertexArray(GLuint positionVBO,
                                  GLuint colorVBO,
@@ -115,9 +119,8 @@ GLuint Renderer::initTexture(char const* Filename) {
     gli::gl::format const Format = GL.translate(Texture.format());
     GLenum Target = GL.translate(Texture.target());
 
-    GLuint TextureName = 0;
-    glGenTextures(1, &TextureName);
-    glBindTexture(Target, TextureName);
+    glGenTextures(1, &textureId);
+    glBindTexture(Target, textureId);
     glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(Target,
         GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
@@ -165,7 +168,7 @@ GLuint Renderer::initTexture(char const* Filename) {
                                 Format.External, Format.Type,
                                 Texture.data(Layer, Face, Level));
             }
-    return TextureName;
+    return textureId;
 }
 
 static void printProgramInfoLog(GLuint program) {

@@ -38,7 +38,7 @@
 Simulator* simulator;
 Renderer* renderer = NULL;
 GLFWwindow* window = NULL;
-bool fullscreen = true;
+bool fullscreen = false;
 
 int currentWindowWidth = window_width;
 int currentWindowHeight = window_height;
@@ -320,5 +320,9 @@ int main(int argc, char** argv) {
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    delete(renderer);
+    delete(simulator);
+
     exit(EXIT_SUCCESS);
 }

@@ -65,8 +65,6 @@ class Simulator {
     cl::CommandQueue queue;
     cl::Program program;
     cl::Kernel kernel;
-
-    cl_int err;
     cl::Event event;
 
     static const char* oclErrorString(cl_int error);
