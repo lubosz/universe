@@ -55,21 +55,21 @@ __kernel void vortex(
           continue;
 
         float4 distance = pos[j] - p;
+        float qdistance = dot(distance, distance);
 
         // Ignore 0 distances
-        if (length(distance) <= 0)
+        if (qdistance <= 0)
             continue;
 
-        // Calculate force with minimum distance threshold
-        if (length(distance) > 0.1) {
-          float acceleration = GRAVITY * masses[j] / (pow(length(distance),2));
+        if (qdistance > 0.01) {
+          float acceleration = GRAVITY * masses[j] / qdistance;
           accelerationDirection += normalize(distance) * acceleration;
         }
 
         // Merge small particle into big if distance is short enough
         if (
             //length(distance) < (masses[j]+masses[i]) * 0.00015 &&
-            length(distance) < 0.01 &&
+            qdistance < 0.0001 &&
             masses[i] < masses[j]) {
                   masses[j] += masses[i];
                   // Use small particle velocity on big

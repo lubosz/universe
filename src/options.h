@@ -47,7 +47,7 @@ const float rotationSpeed = 0.002;
 
 // Simulation
 
-#define NUM_PARTICLES 10000
+#define NUM_PARTICLES 15000
 
 // Speed
 const float slowDt = 100.0f;
